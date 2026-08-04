@@ -631,10 +631,13 @@ async function doAdminLogin() {
         return;
     }
     try {
-        const res = await fetch(API + '/admin/login', {
+        const res = await fetch(API + '/user/login', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password })
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Admin-Password': password
+            },
+            body: JSON.stringify({ username: 'admin', password })
         });
         const data = await res.json();
         if (data.code === 0) {
