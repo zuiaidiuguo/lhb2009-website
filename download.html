@@ -3,39 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>网盘工具 - LHB 工具箱</title>
+<title>下载 - 工具箱</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  background: linear-gradient(180deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
-  background-attachment: fixed; min-height: 100vh; color: #e8e8f0;
+  background: linear-gradient(180deg, #0d1a2d 0%, #132b3a 50%, #1a2a3a 100%);
+  background-attachment: fixed; min-height: 100vh; color: #e6f0fa;
 }
-.container { max-width: 900px; margin: 0 auto; padding: 16px; }
+.container { max-width: 720px; margin: 0 auto; padding: 16px; }
 
 .header { display:flex; align-items:center; gap:14px; padding: 20px 4px 16px; }
 .back-btn {
   width: 38px; height: 38px; border-radius: 50%; border:none; cursor:pointer;
-  background: rgba(255,255,255,.1); color:#e8e8f0; font-size:18px;
-  display:flex; align-items:center; justify-content:center; transition: all .2s;
+  background: rgba(20,60,80,.4); color:#e6f0fa; font-size:18px;
+  display:flex; align-items:center; justify-content:center; border:1px solid #2a4a5a;
 }
-.back-btn:hover { background: rgba(255,255,255,.2); }
-.header h1 { font-size: 24px; font-weight:700;
-  background: linear-gradient(90deg,#7c8cff,#a78bfa);
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.back-btn:hover { background: rgba(20,60,80,.6); }
+.header h1 {
+  font-size: 24px; font-weight:700;
+  background: linear-gradient(90deg, #4f7cff, #00c6ff);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
 
-.tool-list { display:flex; flex-direction:column; gap:14px; padding-top:8px; }
+/* 工具列表 */
+.tool-list { display:flex; flex-direction:column; gap:12px; padding-top:8px; }
 .tool-item {
-  display:flex; align-items:center; gap:18px;
-  background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
-  border-radius: 16px; padding: 22px 20px; cursor:pointer; transition: all .25s;
+  display:flex; align-items:center; gap:16px;
+  background: rgba(20,60,80,.3); border:1px solid #2a4a5a;
+  border-radius:14px; padding: 18px 20px; cursor:pointer; transition: all .25s;
 }
-.tool-item:hover { background: rgba(255,255,255,.1); transform: translateY(-2px); }
-.tool-item .icon { font-size: 34px; }
-.tool-item .info { flex:1; }
-.tool-item .info h2 { font-size: 18px; margin-bottom:4px; }
-.tool-item .info p { font-size:13px; color:rgba(232,232,240,.55); }
-.tool-item .dl { color: rgba(124,140,255,.8); font-size:13px; }
+.tool-item:hover { background: rgba(20,60,80,.5); border-color:#00d4ff; transform: translateY(-2px); }
+.tool-item .icon { font-size: 28px; }
+.tool-item .name { flex:1; font-size:16px; font-weight:500; }
+.tool-item .dl { color:#00d4ff; font-size:14px; }
 
 /* 验证码模态框 */
 .modal {
@@ -45,28 +46,34 @@ body {
 }
 .modal.show { display:flex; }
 .modal-box {
-  background:#1a1a2e; border:1px solid rgba(255,255,255,.1);
+  background:#132b3a; border:1px solid #2a4a5a;
   border-radius:18px; width:100%; max-width:340px; padding:24px; text-align:center;
+  position:relative;
 }
+.modal-close {
+  position:absolute; top:10px; right:14px; background:none; border:none;
+  color:#8ab4d4; font-size:22px; cursor:pointer; line-height:1;
+}
+.modal-close:hover { color:#00d4ff; }
 .modal-box h3 { font-size:18px; margin-bottom:6px; }
-.modal-box .hint { font-size:13px; color:rgba(232,232,240,.6); margin-bottom:16px; }
+.modal-box .hint { font-size:13px; color:#8ab4d4; margin-bottom:16px; }
 .captcha-box {
   font-size:28px; font-weight:700; letter-spacing:8px; padding:14px;
-  background: rgba(255,255,255,.06); border-radius:12px; margin-bottom:14px;
-  user-select:none; cursor:pointer; color:#a78bfa;
+  background: rgba(20,60,80,.3); border:1px solid #2a4a5a; border-radius:12px;
+  margin-bottom:14px; user-select:none; cursor:pointer; color:#00d4ff;
 }
 .captcha-input {
-  width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.15);
-  background: rgba(255,255,255,.06); color:#e8e8f0; font-size:20px; text-align:center;
+  width:100%; padding:12px 14px; border-radius:12px; border:1px solid #2a4a5a;
+  background: rgba(20,60,80,.3); color:#e6f0fa; font-size:20px; text-align:center;
   letter-spacing:6px; outline:none; margin-bottom:14px;
 }
-.captcha-input:focus { border-color:#7c8cff; }
+.captcha-input:focus { border-color:#00d4ff; }
 .btn-primary {
   width:100%; padding:13px; border:none; border-radius:12px; cursor:pointer;
-  background: linear-gradient(135deg,#7c8cff,#a78bfa); color:#fff; font-size:15px; font-weight:600;
+  background: linear-gradient(135deg, #4f7cff, #00c6ff); color:#fff; font-size:15px; font-weight:600;
 }
 .btn-primary:hover { filter:brightness(1.1); }
-.captcha-refresh { font-size:12px; color:rgba(232,232,240,.5); margin-top:10px; cursor:pointer; }
+.captcha-refresh { font-size:12px; color:#8ab4d4; margin-top:10px; cursor:pointer; }
 .msg { font-size:13px; margin-top:10px; padding:8px; border-radius:8px; display:none; }
 .msg.err { display:block; background:rgba(255,80,80,.15); color:#ff8a8a; }
 .msg.ok { display:block; background:rgba(80,200,120,.15); color:#7edba0; }
@@ -76,17 +83,16 @@ body {
 <div class="container">
   <div class="header">
     <button class="back-btn" onclick="location.href='index.html'">←</button>
-    <h1>网盘工具</h1>
+    <h1>下载</h1>
   </div>
 
-  <div class="tool-list" id="toolList">
-    <!-- 工具包列表由 JS 渲染 -->
-  </div>
+  <div class="tool-list" id="toolList"></div>
 </div>
 
 <!-- 验证码模态框 -->
 <div class="modal" id="captchaModal">
   <div class="modal-box">
+    <button class="modal-close" onclick="closeCaptcha()">&times;</button>
     <h3 id="dlTitle">下载</h3>
     <div class="hint">请输入 4 位数字验证码</div>
     <div class="captcha-box" id="captchaBox" onclick="refreshCaptcha()">----</div>
@@ -100,18 +106,25 @@ body {
 <script>
 const API = 'https://sb.lhb2009.cc.cd';
 
-// 示例工具包数据
+// 工具包列表（真实 CDN 地址）
+const CDN = 'https://cdn.jsdelivr.net/gh/zuiaidiuguo/lhb2009-website@master';
 const tools = [
-  { name:'LHB 工具箱 v1.0', desc:'主程序安装包', icon:'📦', url:'/files/lhb-tools-v1.0.apk' },
-  { name:'音乐播放器扩展', desc:'音乐功能增强包', icon:'🎵', url:'/files/music-pack.zip' },
-  { name:'网盘助手', desc:'网盘下载辅助工具', icon:'💾', url:'/files/pan-helper.apk' },
-  { name:'主题皮肤包', desc:'深色主题皮肤', icon:'🎨', url:'/files/theme-pack.zip' }
+  { name:'截屏.zip', icon:'📸', url: CDN + '/files/截屏.zip' },
+  { name:'解压.zip', icon:'🗜️', url: CDN + '/files/解压.zip' },
+  { name:'硬件检测工具.zip', icon:'🔧', url: CDN + '/files/硬件检测工具.zip' },
+  { name:'win7激活工具.zip', icon:'💻', url: CDN + '/files/win7激活工具.zip' },
+  { name:'全能激活工具.zip', icon:'⚡', url: CDN + '/files/全能激活工具.zip' },
+  { name:'Dism++系统修复.zip', icon:'🛠️', url: CDN + '/files/Dism++系统修复.zip' },
+  { name:'搞机工具箱11.1.2.7z', icon:'📦', url: CDN + '/files/搞机工具箱11.1.2.7z' },
+  { name:'搜索工具.zip', icon:'🔍', url: CDN + '/files/搜索工具.zip' },
+  { name:'网络工具.zip', icon:'🌐', url: CDN + '/files/网络工具.zip' },
+  { name:'复制文件工具.zip', icon:'📋', url: CDN + '/files/复制文件工具.zip' },
+  { name:'误删文件恢复工具.zip', icon:'♻️', url: CDN + '/files/误删文件恢复工具.zip' }
 ];
 
 let currentTool = null;
 let captchaCode = '';
 
-// 渲染列表
 function renderList() {
   const list = document.getElementById('toolList');
   list.innerHTML = '';
@@ -120,17 +133,13 @@ function renderList() {
     div.className = 'tool-item';
     div.innerHTML = `
       <div class="icon">${t.icon}</div>
-      <div class="info">
-        <h2>${t.name}</h2>
-        <p>${t.desc}</p>
-      </div>
+      <div class="name">${t.name}</div>
       <div class="dl">下载 ↓</div>`;
     div.onclick = () => openCaptcha(t);
     list.appendChild(div);
   });
 }
 
-// 生成 4 位数字验证码
 function genCaptcha() {
   captchaCode = '';
   for (let i=0; i<4; i++) captchaCode += Math.floor(Math.random()*10);
@@ -155,6 +164,10 @@ function openCaptcha(tool) {
   setTimeout(()=>document.getElementById('captchaInput').focus(), 100);
 }
 
+function closeCaptcha() {
+  document.getElementById('captchaModal').classList.remove('show');
+}
+
 function verifyCaptcha() {
   const input = document.getElementById('captchaInput').value;
   const msg = document.getElementById('captchaMsg');
@@ -162,10 +175,9 @@ function verifyCaptcha() {
     msg.className = 'msg ok';
     msg.textContent = '验证成功，即将开始下载...';
     setTimeout(() => {
-      document.getElementById('captchaModal').classList.remove('show');
-      // 触发下载
+      closeCaptcha();
       const a = document.createElement('a');
-      a.href = API + currentTool.url;
+      a.href = currentTool.url;
       a.download = '';
       document.body.appendChild(a);
       a.click();
@@ -180,10 +192,10 @@ function verifyCaptcha() {
 
 // ESC 关闭
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') document.getElementById('captchaModal').classList.remove('show');
+  if (e.key === 'Escape') closeCaptcha();
 });
 document.getElementById('captchaModal').addEventListener('click', e => {
-  if (e.target === document.getElementById('captchaModal')) document.getElementById('captchaModal').classList.remove('show');
+  if (e.target === document.getElementById('captchaModal')) closeCaptcha();
 });
 
 renderList();

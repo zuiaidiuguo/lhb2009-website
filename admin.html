@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>管理后台 - 工具箱</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(180deg, #0d1a2d 0%, #132b3a 50%, #1a2a3a 100%);
+  background-attachment: fixed; min-height: 100vh; color: #e6f0fa;
+}
+.container { max-width: 720px; margin: 0 auto; padding: 16px; }
+
+.header { display:flex; align-items:center; gap:14px; padding: 20px 4px 16px; }
+.back-btn {
+  width: 38px; height: 38px; border-radius: 50%; border:none; cursor:pointer;
+  background: rgba(20,60,80,.4); color:#e6f0fa; font-size:18px;
+  display:flex; align-items:center; justify-content:center; border:1px solid #2a4a5a;
+}
+.back-btn:hover { background: rgba(20,60,80,.6); }
+.header h1 {
+  font-size: 24px; font-weight:700;
+  background: linear-gradient(90deg, #4f7cff, #00c6ff);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+
+/* 密码验证 */
+.login-panel {
+  max-width: 360px; margin: 60px auto; text-align:center;
+  background: rgba(20,60,80,.3); border:1px solid #2a4a5a;
+  border-radius:18px; padding: 30px 24px;
+}
+.login-panel h2 { font-size:20px; margin-bottom:20px; }
+input[type="password"], input[type="text"] {
+  width:100%; padding:12px 14px; border-radius:12px; border:1px solid #2a4a5a;
+  background: rgba(20,60,80,.3); color:#e6f0fa; font-size:14px; margin-bottom:12px; outline:none;
+}
+input:focus { border-color:#00d4ff; }
+.btn-primary {
+  width:100%; padding:13px; border:none; border-radius:12px; cursor:pointer;
+  background: linear-gradient(135deg, #4f7cff, #00c6ff); color:#fff;
+  font-size:15px; font-weight:600; transition: all .2s;
+}
+.btn-primary:hover { filter:brightness(1.1); }
+.btn-small {
+  padding: 6px 12px; border:1px solid #2a4a5a; border-radius:8px; cursor:pointer;
+  background: rgba(79,124,255,.2); color:#e6f0fa; font-size:12px; margin:2px;
+}
+.btn-small:hover { background: rgba(79,124,255,.35); }
+.btn-small.danger { background: rgba(255,80,80,.2); color:#ff8a8a; }
+.msg { font-size:13px; margin-top:10px; padding:8px; border-radius:8px; display:none; }
+.msg.ok { display:block; background:rgba(80,200,120,.15); color:#7edba0; }
+.msg.err { display:block; background:rgba(255,80,80,.15); color:#ff8a8a; }
+
+/* 管理面板 */
+.admin-panel { display:none; }
+.admin-panel.show { display:block; }
+.tabs { display:flex; gap:6px; margin-bottom:18px; flex-wrap:wrap; }
+.tab-btn {
+  padding: 8px 14px; border-radius:16px; border:1px solid #2a4a5a; cursor:pointer;
+  background: rgba(20,60,80,.3); color:#8ab4d4; font-size:13px; transition: all .2s;
+}
+.tab-btn.active { background: linear-gradient(135deg, #4f7cff, #00c6ff); color:#fff; border:none; }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+
+.panel-card {
+  background: rgba(20,60,80,.3); border:1px solid #2a4a5a;
+  border-radius:14px; padding:20px;
+}
+textarea {
+  width:100%; padding:12px 14px; border-radius:12px; border:1px solid #2a4a5a;
+  background: rgba(20,60,80,.3); color:#e6f0fa; font-size:14px; margin-bottom:12px; outline:none;
+  resize:vertical; min-height:80px; font-family:inherit;
+}
+textarea:focus { border-color:#00d4ff; }
+
+/* 列表项 */
+.list-item {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:12px 6px; border-bottom:1px solid rgba(42,74,90,.4);
+}
+.list-item .info { flex:1; }
+.list-item .info .name { font-size:14px; }
+.list-item .info .sub { font-size:12px; color:#8ab4d4; }
+
+/* 柱形图 */
+.chart-wrap { margin-top:10px; }
+.chart-title { text-align:center; font-size:15px; color:#8ab4d4; margin-bottom:20px; }
+.chart {
+  display:flex; align-items:flex-end; justify-content:space-around;
+  height: 220px; padding: 0 10px; border-bottom:1px solid #2a4a5a;
+}
+.bar-col { display:flex; flex-direction:column; align-items:center; flex:1; }
+.bar-value { font-size:12px; color:#00d4ff; margin-bottom:6px; }
+.bar {
+  width: 32px; max-width:60%; border-radius:6px 6px 0 0;
+  background: linear-gradient(180deg, #00c6ff, #4f7cff);
+  min-height: 4px; transition: height .5s ease;
+}
+.bar:hover { filter:brightness(1.2); }
+.bar-label { font-size:12px; color:#8ab4d4; margin-top:8px; }
+.chart-empty { text-align:center; color:#8ab4d4; padding:40px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <button class="back-btn" onclick="location.href='index.html'">←</button>
+    <h1>管理后台</h1>
+  </div>
+
+  <!-- 密码验证 -->
+  <div class="login-panel" id="loginPanel">
+    <h2>🔒 管理员登录</h2>
+    <input type="password" id="adminPass" placeholder="请输入管理员密码">
+    <button class="btn-primary" onclick="verifyPass()">进入后台</button>
+    <div class="msg" id="loginMsg"></div>
+  </div>
+
+  <!-- 管理面板 -->
+  <div class="admin-panel" id="adminPanel">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('tab-announce',this)">📢 发布公告</button>
+      <button class="tab-btn" onclick="switchTab('tab-register',this)">👤 注册用户</button>
+      <button class="tab-btn" onclick="switchTab('tab-users',this)">👥 用户列表</button>
+      <button class="tab-btn" onclick="switchTab('tab-requests',this)">🎵 歌曲请求</button>
+      <button class="tab-btn" onclick="switchTab('tab-stats',this)">📊 访问统计</button>
+    </div>
+
+    <!-- 发布公告 -->
+    <div class="tab-panel active" id="tab-announce">
+      <div class="panel-card">
+        <input type="text" id="annTitle" placeholder="公告标题">
+        <textarea id="annContent" placeholder="公告内容"></textarea>
+        <button class="btn-primary" onclick="publishAnnounce()">发布</button>
+        <div class="msg" id="annMsg"></div>
+      </div>
+    </div>
+
+    <!-- 注册用户 -->
+    <div class="tab-panel" id="tab-register">
+      <div class="panel-card">
+        <input type="text" id="regUser" placeholder="用户名">
+        <input type="password" id="regPass" placeholder="密码">
+        <button class="btn-primary" onclick="registerUser()">注册</button>
+        <div class="msg" id="regMsg"></div>
+      </div>
+    </div>
+
+    <!-- 用户列表 -->
+    <div class="tab-panel" id="tab-users">
+      <div class="panel-card">
+        <button class="btn-primary" style="margin-bottom:12px" onclick="loadUsers()">加载用户列表</button>
+        <div id="userList"></div>
+        <div class="msg" id="usersMsg"></div>
+      </div>
+    </div>
+
+    <!-- 歌曲请求 -->
+    <div class="tab-panel" id="tab-requests">
+      <div class="panel-card">
+        <button class="btn-primary" style="margin-bottom:12px" onclick="loadRequests()">加载歌曲请求</button>
+        <div id="reqList"></div>
+        <div class="msg" id="reqMsg"></div>
+      </div>
+    </div>
+
+    <!-- 访问统计 -->
+    <div class="tab-panel" id="tab-stats">
+      <div class="panel-card">
+        <button class="btn-primary" style="margin-bottom:12px" onclick="loadStats()">加载访问统计</button>
+        <div class="chart-wrap" id="chartArea">
+          <div class="chart-empty">点击「加载访问统计」查看最近 7 天数据</div>
+        </div>
+        <div class="msg" id="statsMsg"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://sb.lhb2009.cc.cd';
+const ADMIN_PASS = '20091030';
+
+let isAuthed = false;
+
+// 密码验证
+function verifyPass() {
+  const p = document.getElementById('adminPass').value;
+  const msg = document.getElementById('loginMsg');
+  if (p === ADMIN_PASS) {
+    isAuthed = true;
+    document.getElementById('loginPanel').style.display = 'none';
+    document.getElementById('adminPanel').classList.add('show');
+  } else {
+    msg.className = 'msg err';
+    msg.textContent = '密码错误';
+  }
+}
+
+function switchTab(panel, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(panel).classList.add('active');
+  btn.classList.add('active');
+}
+
+// 发布公告
+async function publishAnnounce() {
+  const title = document.getElementById('annTitle').value.trim();
+  const content = document.getElementById('annContent').value.trim();
+  const msg = document.getElementById('annMsg');
+  if (!title || !content) { msg.className='msg err'; msg.textContent='请填写完整信息'; return; }
+  try {
+    const res = await fetch(`${API}/announcement`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ password: ADMIN_PASS, title, content })
+    });
+    const data = await res.json();
+    if (data.code === 0 || data.success) {
+      msg.className='msg ok'; msg.textContent='公告发布成功';
+      document.getElementById('annTitle').value=''; document.getElementById('annContent').value='';
+    } else {
+      msg.className='msg err'; msg.textContent = data.message || '发布失败';
+    }
+  } catch(e) { msg.className='msg err'; msg.textContent='网络错误'; }
+}
+
+// 注册用户
+async function registerUser() {
+  const u = document.getElementById('regUser').value.trim();
+  const p = document.getElementById('regPass').value;
+  const msg = document.getElementById('regMsg');
+  if (!u || !p) { msg.className='msg err'; msg.textContent='请填写完整信息'; return; }
+  try {
+    const res = await fetch(`${API}/register`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ password: ADMIN_PASS, username:u, userpass:p })
+    });
+    const data = await res.json();
+    if (data.code === 0 || data.success) {
+      msg.className='msg ok'; msg.textContent='用户注册成功';
+      document.getElementById('regUser').value=''; document.getElementById('regPass').value='';
+    } else {
+      msg.className='msg err'; msg.textContent = data.message || '注册失败';
+    }
+  } catch(e) { msg.className='msg err'; msg.textContent='网络错误'; }
+}
+
+// 用户列表
+async function loadUsers() {
+  const msg = document.getElementById('usersMsg');
+  try {
+    const res = await fetch(`${API}/users?password=${encodeURIComponent(ADMIN_PASS)}`);
+    const data = await res.json();
+    if (data.code === 0 || data.success) {
+      const list = document.getElementById('userList');
+      list.innerHTML = '';
+      const users = data.data || data.users || [];
+      users.forEach(u => {
+        const div = document.createElement('div');
+        div.className = 'list-item';
+        div.innerHTML = `
+          <div class="info">
+            <div class="name">${u.username}</div>
+            <div class="sub">${u.created_at||''}</div>
+          </div>
+          <div>
+            <button class="btn-small" onclick="editUser('${u.username}')">编辑</button>
+            <button class="btn-small danger" onclick="delUser('${u.username}')">删除</button>
+          </div>`;
+        list.appendChild(div);
+      });
+      if (users.length === 0) list.innerHTML = '<div style="color:#8ab4d4;padding:20px;text-align:center">暂无用户</div>';
+      msg.className='msg ok'; msg.textContent='加载成功';
+    } else {
+      msg.className='msg err'; msg.textContent = data.message || '加载失败';
+    }
+  } catch(e) { msg.className='msg err'; msg.textContent='网络错误'; }
+}
+
+async function editUser(username) {
+  const newPass = prompt(`编辑用户 ${username} 的新密码：`);
+  if (!newPass) return;
+  try {
+    const res = await fetch(`${API}/users/${username}`, {
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ password: ADMIN_PASS, newPassword:newPass })
+    });
+    const data = await res.json();
+    const msg = document.getElementById('usersMsg');
+    if (data.code === 0 || data.success) { msg.className='msg ok'; msg.textContent='修改成功'; loadUsers(); }
+    else { msg.className='msg err'; msg.textContent = data.message||'修改失败'; }
+  } catch(e) { msg.className='msg err'; msg.textContent='网络错误'; }
+}
+
+async function delUser(username) {
+  if (!confirm(`确定删除用户 ${username}？`)) return;
+  try {
+    const res = await fetch(`${API}/users/${username}`, {
+      method:'DELETE', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ password: ADMIN_PASS })
+    });
+    const data = await res.json();
+    const msg = document.getElementById('usersMsg');
+    if (data.code === 0 || data.success) { msg.className='msg ok'; msg.textContent='删除成功'; loadUsers(); }
+    else { msg.className='msg err'; msg.textContent = data.message||'删除失败'; }
+  } catch(e) { msg.className='msg err'; msg.textContent='网络错误'; }
+}
+
+// 歌曲请求
+async function loadRequests() {
+  const msg = document.getElementById('reqMsg');
+  try {
+    const res = await fetch(`${API}/requests?password=${encodeURIComponent(ADMIN_PASS)}`);
+    const data = await res.json();
+    if (data.code === 0 || data.success) {
+      const list = document.getElementById('reqList');
+      list.innerHTML = '';
+      const reqs = data.data || data.requests || [];
+      reqs.forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'list-item';
+        div.innerHTML = `
+          <div class="info">
+            <div class="name">${r.song}</div>
+            <div class="sub">由 ${r.username} 提交</div>
+          </div>
+          <button class="btn-small danger" onclick="delRequest(${r.id})">删除</button>`;
+        list.appendChild(div);
+      });
+      if (reqs.length === 0) list.innerHTML = '<div style="color:#8ab4d4;padding:20px;text-align:center">暂无歌曲请求</div>';
+      msg.className='msg ok'; msg.textContent='加载成功';
+    } else {
+      msg.className='msg err'; msg.textContent = data.message || '加载失败';
+    }
+  } catch(e) { msg.className='msg err'; msg.textContent='网络错误'; }
+}
+
+async function delRequest(id) {
+  try {
+    const res = await fetch(`${API}/requests/${id}`, {
+      method:'DELETE', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ password: ADMIN_PASS })
+    });
+    const data = await res.json();
+    const msg = document.getElementById('reqMsg');
+    if (data.code === 0 || data.success) { msg.className='msg ok'; msg.textContent='删除成功'; loadRequests(); }
+    else { msg.className='msg err'; msg.textContent = data.message||'删除失败'; }
+  } catch(e) { msg.className='msg err'; msg.textContent='网络错误'; }
+}
+
+// 访问统计
+async function loadStats() {
+  const msg = document.getElementById('statsMsg');
+  const area = document.getElementById('chartArea');
+  try {
+    const res = await fetch(`${API}/stats/visits`);
+    const data = await res.json();
+    const list = data.data || data.list || [];
+    if ((data.code === 0 || data.success) && list.length > 0) {
+      renderChart(list);
+      msg.className='msg ok'; msg.textContent='加载成功';
+    } else {
+      area.innerHTML = '<div class="chart-empty">暂无统计数据</div>';
+      msg.className='msg ok'; msg.textContent='加载成功（无数据）';
+    }
+  } catch(e) {
+    area.innerHTML = '<div class="chart-empty">加载失败</div>';
+    msg.className='msg err'; msg.textContent='网络错误';
+  }
+}
+
+function renderChart(list) {
+  const area = document.getElementById('chartArea');
+  const maxCount = Math.max(...list.map(d => d.count), 1);
+  let html = '<div class="chart-title">最近 7 天访问量</div><div class="chart">';
+  list.forEach(d => {
+    const h = Math.max(6, (d.count / maxCount) * 180);
+    const label = formatDate(d.date);
+    html += `
+      <div class="bar-col">
+        <div class="bar-value">${d.count}</div>
+        <div class="bar" style="height:${h}px"></div>
+        <div class="bar-label">${label}</div>
+      </div>`;
+  });
+  html += '</div>';
+  area.innerHTML = html;
+}
+
+function formatDate(dateStr) {
+  // 支持 2026-08-01 或 8/1 格式
+  if (!dateStr) return '';
+  const m = dateStr.match(/(\d{1,2})[/-](\d{1,2})$/);
+  if (m) return `${parseInt(m[1])}/${parseInt(m[2])}`;
+  const d = new Date(dateStr);
+  if (!isNaN(d)) return `${d.getMonth()+1}/${d.getDate()}`;
+  return dateStr;
+}
+
+// 回车登录
+document.getElementById('adminPass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') verifyPass();
+});
+</script>
+</body>
+</html>
