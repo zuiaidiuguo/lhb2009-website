@@ -344,7 +344,7 @@ let adminPassword = '';
 // ============ 公告获取 ============
 async function fetchAnnouncement() {
     try {
-        const res = await fetch('https://api.lhb20091030.workers.dev/announcement');
+        const res = await fetch('https://api.lhb2009.cc/announcement');
         const data = await res.json();
         const el = document.getElementById('announcementContent');
         if (data.announcement && data.announcement.trim()) {
@@ -378,7 +378,7 @@ async function doLogin() {
         return;
     }
     try {
-        const res = await fetch('https://api.lhb20091030.workers.dev/login', {
+        const res = await fetch('https://api.lhb2009.cc/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ password })
@@ -424,7 +424,7 @@ async function publishAnnouncement() {
         return;
     }
     try {
-        const res = await fetch('https://api.lhb20091030.workers.dev/announcement', {
+        const res = await fetch('https://api.lhb2009.cc/announcement', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
