@@ -5,188 +5,141 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>网盘工具 - 工具箱</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  background: linear-gradient(135deg, #0d0d1a 0%, #0d1a2d 50%, #132b3a 100%);
-  background-attachment: fixed; min-height: 100vh; color: #e6f0fa;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+  background:linear-gradient(135deg,#0d0d1a 0%,#1a0d2a 35%,#2a1040 70%,#0d0a1a 100%);
+  min-height:100vh; color:#f3e8ff;
 }
-.container { max-width: 720px; margin: 0 auto; padding: 16px; }
+.wrap { max-width:860px; margin:0 auto; padding:16px; padding-bottom:40px; }
+.topbar { display:flex; align-items:center; gap:14px; padding:14px 4px 18px; }
+.back { font-size:28px; color:#22d3ee; cursor:pointer; text-decoration:none; }
+.title { font-size:24px; font-weight:800; color:#22d3ee; }
 
-.header { display:flex; align-items:center; gap:14px; padding: 20px 4px 16px; }
-.back-btn {
-  width: 38px; height: 38px; border-radius: 50%; border:none; cursor:pointer;
-  background: rgba(255,255,255,.1); color:#e6f0fa; font-size:18px;
-  display:flex; align-items:center; justify-content:center;
+/* 工具包列表 */
+.list { display:flex; flex-direction:column; gap:12px; }
+.item {
+  display:flex; align-items:center; gap:16px; padding:18px 20px; border-radius:16px; cursor:pointer;
+  background:rgba(50,20,70,.4); border:1px solid rgba(34,211,238,.35);
+  transition:transform .3s, box-shadow .3s;
 }
-.back-btn:hover { background: rgba(255,255,255,.2); }
-.header h1 {
-  font-size: 24px; font-weight:700;
-  background: linear-gradient(90deg, #48dbfb, #1dd1a1);
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-}
+.item:hover { transform:scale(1.03); box-shadow:0 0 24px rgba(34,211,238,.4); }
+.item .ico { font-size:34px; }
+.item .nm { flex:1; font-size:17px; font-weight:600; }
+.item .dl { font-size:13px; color:#22d3ee; border:1px solid rgba(34,211,238,.5); padding:6px 14px; border-radius:20px; }
 
-/* 工具列表 - 蓝色/青色混合 */
-.tool-list { display:flex; flex-direction:column; gap:12px; padding-top:8px; }
-.tool-item {
-  display:flex; align-items:center; gap:16px;
-  background: rgba(255,255,255,.06); border-radius:14px; padding: 18px 20px; cursor:pointer;
-  transition: all .25s; border-left: 4px solid;
-}
-.tool-item:nth-child(odd) { border-left-color: #48dbfb; }
-.tool-item:nth-child(even) { border-left-color: #1dd1a1; }
-.tool-item:hover { background: rgba(255,255,255,.1); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(72,219,251,.15); }
-.tool-item .icon { font-size: 28px; }
-.tool-item .name { flex:1; font-size:16px; font-weight:500; }
-.tool-item .dl { color:#48dbfb; font-size:14px; }
-
-/* 验证码模态框 - 蓝色/青色 */
-.modal {
-  display:none; position:fixed; inset:0; z-index:100;
-  background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
-  align-items:center; justify-content:center; padding:16px;
-}
-.modal.show { display:flex; }
-.modal-box {
-  background:#0d1a2d; border:1px solid #48dbfb; border-radius:18px;
-  width:100%; max-width:340px; padding:24px; text-align:center; position:relative;
-}
-.modal-close {
-  position:absolute; top:10px; right:14px; background:none; border:none;
-  color:rgba(255,255,255,.5); font-size:22px; cursor:pointer; line-height:1;
-}
-.modal-close:hover { color:#48dbfb; }
-.modal-box h3 { font-size:18px; margin-bottom:6px;
-  background: linear-gradient(90deg,#48dbfb,#1dd1a1);
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-.modal-box .hint { font-size:13px; color:#8ab4d4; margin-bottom:16px; }
-.captcha-box {
-  font-size:28px; font-weight:700; letter-spacing:8px; padding:14px;
-  background: rgba(255,255,255,.08); border:1px solid #48dbfb; border-radius:12px;
-  margin-bottom:14px; user-select:none; cursor:pointer; color:#48dbfb;
-}
-.captcha-input {
-  width:100%; padding:12px 14px; border-radius:12px; border:1px solid #444;
-  background: rgba(255,255,255,.08); color:#e6f0fa; font-size:20px; text-align:center;
-  letter-spacing:6px; outline:none; margin-bottom:14px;
-}
-.captcha-input:focus { border-color:#48dbfb; }
-.btn-primary {
-  width:100%; padding:13px; border:none; border-radius:12px; cursor:pointer;
-  background: linear-gradient(135deg, #48dbfb, #1dd1a1); color:#fff; font-size:15px; font-weight:600;
-}
-.btn-primary:hover { filter:brightness(1.1); }
-.captcha-refresh { font-size:12px; color:#8ab4d4; margin-top:10px; cursor:pointer; }
-.msg { font-size:13px; margin-top:10px; padding:8px; border-radius:8px; display:none; }
-.msg.err { display:block; background:rgba(255,80,80,.15); color:#ff8a8a; }
-.msg.ok { display:block; background:rgba(80,200,120,.15); color:#7edba0; }
+/* 验证码弹窗 */
+.modal-mask { position:fixed; inset:0; background:rgba(0,0,0,.65); display:none; align-items:center; justify-content:center; z-index:999; }
+.modal-mask.show { display:flex; }
+.modal-box { width:90%; max-width:340px; background:#1a1030; border:1px solid rgba(168,85,247,.4); border-radius:18px; padding:26px 22px; position:relative; text-align:center; }
+.close-x { position:absolute; top:10px; right:14px; font-size:22px; color:#8b84a8; cursor:pointer; background:none; border:none; }
+.close-x:hover { color:#fff; }
+.modal-box h3 { margin-bottom:6px; font-size:20px; color:#d8b4fe; }
+.hint { font-size:13px; color:#8b84a8; margin-bottom:16px; }
+.captcha-code { font-size:34px; letter-spacing:10px; font-weight:800; color:#c084fc; margin-bottom:16px; user-select:none; }
+.captcha-input { width:100%; padding:12px; border-radius:12px; border:1px solid rgba(168,85,247,.4); background:rgba(255,255,255,.05); color:#fff; font-size:22px; letter-spacing:8px; text-align:center; outline:none; }
+.captcha-input:focus { border-color:#c084fc; }
+.err { color:#f87171; font-size:14px; margin-top:12px; min-height:20px; }
+.modal-btn { width:100%; padding:12px; border:none; border-radius:12px; font-size:16px; font-weight:700; cursor:pointer; margin-top:10px;
+  background:linear-gradient(90deg,#a855f7,#7c3aed); color:#fff; }
+.modal-btn:hover { filter:brightness(1.1); }
+.modal-btn:disabled { opacity:.5; }
+.footer { text-align:center; color:#6d6288; font-size:12px; margin-top:30px; }
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="header">
-    <button class="back-btn" onclick="location.href='index.html'">←</button>
-    <h1>网盘工具</h1>
+<div class="wrap">
+  <div class="topbar">
+    <a class="back" href="index.html">‹</a>
+    <span class="title">📦 网盘工具</span>
   </div>
-  <div class="tool-list" id="toolList"></div>
+
+  <div class="list" id="list"></div>
+  <div class="footer">LHB 工具箱 © 2026</div>
 </div>
 
-<!-- 验证码模态框 -->
-<div class="modal" id="captchaModal">
+<!-- 验证码弹窗 -->
+<div class="modal-mask" id="captchaModal">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeCaptcha()">&times;</button>
-    <h3 id="dlTitle">下载</h3>
-    <div class="hint">请输入 4 位数字验证码</div>
-    <div class="captcha-box" id="captchaBox" onclick="refreshCaptcha()">----</div>
-    <input class="captcha-input" id="captchaInput" maxlength="4" inputmode="numeric" placeholder="····">
-    <button class="btn-primary" onclick="verifyCaptcha()">确认下载</button>
-    <div class="captcha-refresh" onclick="refreshCaptcha()">点击验证码刷新</div>
-    <div class="msg" id="captchaMsg"></div>
+    <button class="close-x" id="closeCaptcha">✕</button>
+    <h3>下载验证</h3>
+    <div class="hint">请输入4位验证码</div>
+    <div class="captcha-code" id="captchaCode">1234</div>
+    <input class="captcha-input" id="captchaInput" maxlength="4" inputmode="numeric" placeholder="····" autocomplete="off">
+    <div class="err" id="captchaErr"></div>
+    <button class="modal-btn" id="btnConfirm" onclick="verifyCaptcha()" disabled>确认下载</button>
   </div>
 </div>
 
 <script>
-const CDN = 'https://cdn.jsdelivr.net/gh/zuiaidiuguo/lhb2009-website@master';
-const tools = [
-  { name:'截屏.zip', icon:'📸', url: CDN + '/files/截屏.zip' },
-  { name:'解压.zip', icon:'🗜️', url: CDN + '/files/解压.zip' },
-  { name:'硬件检测工具.zip', icon:'🔧', url: CDN + '/files/硬件检测工具.zip' },
-  { name:'win7激活工具.zip', icon:'💻', url: CDN + '/files/win7激活工具.zip' },
-  { name:'全能激活工具.zip', icon:'⚡', url: CDN + '/files/全能激活工具.zip' },
-  { name:'Dism++系统修复.zip', icon:'🛠️', url: CDN + '/files/Dism++系统修复.zip' },
-  { name:'搞机工具箱11.1.2.7z', icon:'📦', url: CDN + '/files/搞机工具箱11.1.2.7z' },
-  { name:'搜索工具.zip', icon:'🔍', url: CDN + '/files/搜索工具.zip' },
-  { name:'网络工具.zip', icon:'🌐', url: CDN + '/files/网络工具.zip' },
-  { name:'复制文件工具.zip', icon:'📋', url: CDN + '/files/复制文件工具.zip' },
-  { name:'误删文件恢复工具.zip', icon:'♻️', url: CDN + '/files/误删文件恢复工具.zip' }
+const CDN='https://cdn.jsdelivr.net/gh/zuiaidiuguo/lhb2009-website@master/';
+const tools=[
+  {name:'截屏',file:'截屏.zip',icon:'📸'},
+  {name:'解压',file:'解压.zip',icon:'🗜️'},
+  {name:'硬件检测工具',file:'硬件检测工具.zip',icon:'💻'},
+  {name:'win7激活工具',file:'win7激活工具.zip',icon:'🖥️'},
+  {name:'全能激活工具',file:'全能激活工具.zip',icon:'⚡'},
+  {name:'Dism++系统修复',file:'Dism++系统修复.zip',icon:'🔧'},
+  {name:'搞机工具箱11.1.2',file:'搞机工具箱11.1.2.7z',icon:'🤖'},
+  {name:'搜索工具',file:'搜索工具.zip',icon:'🔍'},
+  {name:'网络工具',file:'网络工具.zip',icon:'🌐'},
+  {name:'复制文件工具',file:'复制文件工具.zip',icon:'📋'},
+  {name:'误删文件恢复工具',file:'误删文件恢复工具.zip',icon:'♻️'}
 ];
 
-let currentTool = null;
-let captchaCode = '';
-
-function renderList() {
-  const list = document.getElementById('toolList');
-  list.innerHTML = '';
-  tools.forEach(t => {
-    const div = document.createElement('div');
-    div.className = 'tool-item';
-    div.innerHTML = `
-      <div class="icon">${t.icon}</div>
-      <div class="name">${t.name}</div>
-      <div class="dl">下载 ↓</div>`;
-    div.onclick = () => openCaptcha(t);
-    list.appendChild(div);
+const listEl=document.getElementById('list');
+function renderList(){
+  listEl.innerHTML='';
+  tools.forEach(t=>{
+    const d=document.createElement('div');
+    d.className='item';
+    d.innerHTML=`<span class="ico">${t.icon}</span><span class="nm">${t.name}</span><span class="dl">下载</span>`;
+    d.onclick=()=>openCaptcha(t);
+    listEl.appendChild(d);
   });
 }
 
-function genCaptcha() {
-  captchaCode = '';
-  for (let i=0; i<4; i++) captchaCode += Math.floor(Math.random()*10);
-  document.getElementById('captchaBox').textContent = captchaCode;
-}
-function refreshCaptcha() {
+// 验证码
+let currentTool=null, captchaCode='';
+function genCaptcha(){ captchaCode=String(Math.floor(1000+Math.random()*9000)); document.getElementById('captchaCode').textContent=captchaCode; }
+function openCaptcha(tool){
+  currentTool=tool;
   genCaptcha();
-  document.getElementById('captchaInput').value = '';
-  document.getElementById('captchaMsg').className = 'msg';
-  document.getElementById('captchaMsg').textContent = '';
-}
-function openCaptcha(tool) {
-  currentTool = tool;
-  document.getElementById('dlTitle').textContent = '下载：' + tool.name;
-  document.getElementById('captchaInput').value = '';
-  document.getElementById('captchaMsg').className = 'msg';
-  document.getElementById('captchaMsg').textContent = '';
-  refreshCaptcha();
+  const inp=document.getElementById('captchaInput');
+  inp.value=''; document.getElementById('captchaErr').textContent=''; document.getElementById('btnConfirm').disabled=true;
   document.getElementById('captchaModal').classList.add('show');
-  setTimeout(()=>document.getElementById('captchaInput').focus(), 100);
+  setTimeout(()=>inp.focus(),100);
 }
-function closeCaptcha() { document.getElementById('captchaModal').classList.remove('show'); }
-function verifyCaptcha() {
-  const input = document.getElementById('captchaInput').value;
-  const msg = document.getElementById('captchaMsg');
-  if (input === captchaCode) {
-    msg.className = 'msg ok';
-    msg.textContent = '验证成功，即将开始下载...';
-    setTimeout(() => {
-      closeCaptcha();
-      const a = document.createElement('a');
-      a.href = currentTool.url;
-      a.download = '';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }, 800);
+
+const input=document.getElementById('captchaInput');
+input.addEventListener('input',()=>{
+  const v=input.value;
+  document.getElementById('btnConfirm').disabled = v.length<4;
+  if(v.length===4) verifyCaptcha();
+});
+
+function verifyCaptcha(){
+  const v=input.value;
+  if(v===captchaCode){
+    document.getElementById('captchaErr').textContent='';
+    document.getElementById('captchaModal').classList.remove('show');
+    const url=CDN+encodeURIComponent(currentTool.file);
+    const a=document.createElement('a');
+    a.href=url; a.download=currentTool.file; a.rel='noopener';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>{ if(!document.getElementById('captchaModal').classList.contains('show')) alert('开始下载：'+currentTool.name); },200);
   } else {
-    msg.className = 'msg err';
-    msg.textContent = '验证码错误，已刷新';
-    refreshCaptcha();
+    const err=document.getElementById('captchaErr');
+    err.textContent='验证码错误，请重新输入';
+    setTimeout(()=>{ err.textContent=''; genCaptcha(); input.value=''; document.getElementById('btnConfirm').disabled=true; },1200);
   }
 }
 
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCaptcha(); });
-document.getElementById('captchaModal').addEventListener('click', e => {
-  if (e.target === document.getElementById('captchaModal')) closeCaptcha();
-});
+// 关闭
+function closeCaptcha(){ document.getElementById('captchaModal').classList.remove('show'); }
+document.getElementById('closeCaptcha').onclick=closeCaptcha;
+document.getElementById('captchaModal').addEventListener('click',e=>{ if(e.target.id==='captchaModal')closeCaptcha(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeCaptcha(); });
 
 renderList();
 </script>

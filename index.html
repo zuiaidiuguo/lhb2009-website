@@ -5,282 +5,232 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>工具箱</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  background: linear-gradient(135deg, #0d0d1a 0%, #1a0d2a 30%, #0d1a2d 65%, #132b3a 100%);
-  background-attachment: fixed; min-height: 100vh; color: #e6f0fa;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+  background:linear-gradient(135deg,#0d0d1a 0%,#1a0d2a 35%,#2a1040 70%,#0d0a1a 100%);
+  min-height:100vh; color:#f3e8ff;
 }
-.container { max-width: 720px; margin: 0 auto; padding: 16px; }
+.wrap { max-width:860px; margin:0 auto; padding:16px; padding-bottom:40px; }
 
 /* 顶部 */
-.header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 20px 4px 16px;
+.topbar { display:flex; justify-content:space-between; align-items:center; padding:18px 4px 8px; }
+.logo {
+  font-size:32px; font-weight:800; letter-spacing:2px;
+  background:linear-gradient(90deg,#e879f9,#a855f7,#7c3aed);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
 }
-.header h1 {
-  font-size: 28px; font-weight: 800;
-  background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #1dd1a1);
-  background-size: 200% auto;
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  animation: rainbow 3s linear infinite;
+.topbtns { display:flex; gap:10px; align-items:center; }
+.topbtns button {
+  padding:8px 16px; border:none; border-radius:20px; cursor:pointer; font-size:14px; font-weight:600;
+  transition:all .3s;
 }
-@keyframes rainbow {
-  to { background-position: 200% center; }
-}
-.header-btns { display: flex; gap: 10px; align-items:center; }
-.header-btns button {
-  padding: 8px 18px; border-radius: 20px; border: none; cursor: pointer;
-  font-size: 14px; font-weight: 600; transition: all .2s;
-}
-.btn-login { background: linear-gradient(135deg, #48dbfb, #1dd1a1); color: #fff; }
-.btn-login:hover { filter: brightness(1.1); }
-.btn-admin { background: linear-gradient(135deg, #a55eea, #5f27cd); color: #fff; }
-.btn-admin:hover { filter: brightness(1.1); }
-.btn-logout { background: rgba(255,255,255,.1); color: #e6f0fa; border:1px solid #444; }
-.btn-logout:hover { background: rgba(255,255,255,.2); }
-#userBadge { font-size: 13px; color: #feca57; margin-right: 8px; }
+.btn-login { background:rgba(168,85,247,.2); color:#c084fc; border:1px solid rgba(168,85,247,.4)!important; }
+.btn-admin { background:rgba(96,165,250,.2); color:#93c5fd; border:1px solid rgba(96,165,250,.4)!important; }
+.btn-logout { background:rgba(248,113,113,.2); color:#fca5a5; border:1px solid rgba(248,113,113,.4)!important; }
+.topbtns button:hover { transform:scale(1.05); filter:brightness(1.15); }
+.username { color:#c084fc; font-size:14px; font-weight:600; }
 
-/* 公告栏 - 金色 */
-.announce-wrap {
-  position: relative; overflow: hidden; margin: 8px 0 24px;
-  background: rgba(255,255,255,.06); border: 1px solid #feca57;
-  border-radius: 12px; height: 44px; display:flex; align-items:center;
-  box-shadow: 0 0 15px rgba(254,202,87,.15);
+/* 公告跑马灯 */
+.announce {
+  margin:14px 0; background:rgba(50,20,70,.4); border:1px solid rgba(251,191,36,.5); border-radius:14px;
+  padding:12px 16px; overflow:hidden;
 }
-.announce-label {
-  flex-shrink:0; padding: 0 14px; font-size:13px; font-weight:600;
-  color:#feca57; border-right:1px solid #feca57; height:100%;
-  display:flex; align-items:center; background: rgba(254,202,87,.08);
-}
-.announce-track { flex:1; overflow:hidden; height:100%; }
-.announce-inner {
-  display:inline-flex; gap: 60px; white-space:nowrap; padding-left:100%;
-  animation: marquee 25s linear infinite;
-}
-.announce-wrap:hover .announce-inner { animation-play-state: paused; }
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
-}
-.anno-item { display:inline-flex; align-items:center; font-size:14px; color:#e6f0fa; cursor:pointer; }
-.anno-item:hover { color:#feca57; }
-.anno-item .tag { color:#feca57; margin-right:8px; }
+.announce-title { font-size:13px; color:#fbbf24; font-weight:700; margin-bottom:6px; display:flex; align-items:center; gap:6px; }
+.announce-track { position:relative; height:22px; overflow:hidden; }
+.announce-track .marquee { position:absolute; white-space:nowrap; font-size:15px; color:#fde68a;
+  animation:marquee 18s linear infinite; }
+@keyframes marquee { 0%{transform:translateX(100%);} 100%{transform:translateX(-100%);} }
 
-/* 功能卡片 */
-.card-list { display: flex; flex-direction: column; gap: 18px; align-items:center; }
-.func-card {
-  display: flex; align-items: center; gap: 16px; width: 100%; max-width: 480px;
-  background: rgba(255,255,255,.06); border-radius: 16px; padding: 26px 24px; cursor: pointer;
-  transition: all .25s;
+/* 卡片 */
+.cards { display:flex; flex-direction:column; gap:18px; margin-top:10px; }
+.card {
+  display:flex; align-items:center; gap:18px; padding:26px 24px; border-radius:20px; cursor:pointer;
+  background:rgba(50,20,70,.4); text-decoration:none; color:#f3e8ff;
+  transition:transform .3s, box-shadow .3s;
 }
-.func-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,.35); }
-.func-card .icon { font-size: 36px; }
-.func-card .name { flex:1; font-size: 18px; font-weight:600; }
-.func-card .arrow { font-size: 22px; color: rgba(255,255,255,.5); }
-.func-card.disabled { opacity: .5; cursor: not-allowed; }
-.func-card.disabled:hover { transform:none; box-shadow:none; }
+.card:hover { transform:scale(1.03); }
+.card .icon { font-size:44px; }
+.card .info { flex:1; }
+.card .info h2 { font-size:22px; font-weight:700; margin-bottom:4px; }
+.card .info p { font-size:14px; opacity:.7; }
+.card .arrow { font-size:22px; opacity:.6; }
 
-/* 各卡片颜色边框 */
-.card-cyan { border: 2px solid #48dbfb; }
-.card-cyan:hover { box-shadow: 0 8px 25px rgba(72,219,251,.25); }
-.card-purple { border: 2px solid #a55eea; }
-.card-purple:hover { box-shadow: 0 8px 25px rgba(165,94,234,.25); }
-.card-gray { border: 2px solid #576574; }
+.card-cyan { border:2px solid #22d3ee; }
+.card-cyan:hover { box-shadow:0 0 28px rgba(34,211,238,.45); }
+.card-pink { border:2px solid #f472b6; }
+.card-pink:hover { box-shadow:0 0 28px rgba(244,114,182,.45); }
+.card-gray { border:2px solid #6b7280; cursor:not-allowed; opacity:.7; }
+.card-gray:hover { transform:none; box-shadow:none; }
 
-/* 模态框 */
-.modal {
-  display:none; position:fixed; inset:0; z-index:100;
-  background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
-  align-items:center; justify-content:center; padding:16px;
-}
-.modal.show { display:flex; }
-.modal-box {
-  background:#1a0d2a; border:1px solid #a55eea; border-radius:18px;
-  width:100%; max-width:380px; padding:24px;
-}
-.modal-close {
-  float:right; background:none; border:none; color:rgba(255,255,255,.5);
-  font-size:22px; cursor:pointer; line-height:1;
-}
-.modal-close:hover { color:#feca57; }
-.modal-box h3 { font-size:18px; margin-bottom:16px;
-  background: linear-gradient(90deg,#ff6b6b,#feca57);
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-input[type="text"], input[type="password"] {
-  width:100%; padding:12px 14px; border-radius:12px; border:1px solid #444;
-  background: rgba(255,255,255,.08); color:#e6f0fa; font-size:14px; margin-bottom:12px; outline:none;
-}
-input:focus { border-color:#48dbfb; }
-.btn-primary {
-  width:100%; padding:13px; border:none; border-radius:12px; cursor:pointer;
-  background: linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #1dd1a1);
-  background-size: 200% auto; color:#fff; font-size:15px; font-weight:600;
-  transition: all .3s;
-}
-.btn-primary:hover { background-position: right center; filter:brightness(1.05); }
-.msg { font-size:13px; margin-top:10px; padding:8px; border-radius:8px; display:none; }
-.msg.ok { display:block; background:rgba(80,200,120,.15); color:#7edba0; }
-.msg.err { display:block; background:rgba(255,80,80,.15); color:#ff8a8a; }
-.announce-content { font-size:14px; color:#e6f0fa; line-height:1.7; white-space:pre-wrap; }
+/* 弹窗 */
+.modal-mask { position:fixed; inset:0; background:rgba(0,0,0,.65); display:none; align-items:center; justify-content:center; z-index:999; }
+.modal-mask.show { display:flex; }
+.modal-box { width:90%; max-width:340px; background:#1a1030; border:1px solid rgba(168,85,247,.4); border-radius:18px; padding:26px 22px; position:relative; }
+.modal-box h3 { text-align:center; margin-bottom:18px; font-size:20px; color:#e9d5ff; }
+.close-x { position:absolute; top:10px; right:14px; font-size:22px; color:#8b84a8; cursor:pointer; background:none; border:none; }
+.close-x:hover { color:#fff; }
+.field { margin-bottom:14px; }
+.field label { display:block; font-size:13px; color:#a99ec9; margin-bottom:6px; }
+.field input { width:100%; padding:11px 14px; border-radius:10px; border:1px solid rgba(168,85,247,.35); background:rgba(255,255,255,.05); color:#fff; font-size:15px; outline:none; }
+.field input:focus { border-color:#c084fc; }
+.modal-btn { width:100%; padding:12px; border:none; border-radius:12px; font-size:16px; font-weight:700; cursor:pointer; margin-top:6px;
+  background:linear-gradient(90deg,#a855f7,#7c3aed); color:#fff; transition:filter .3s; }
+.modal-btn:hover { filter:brightness(1.1); }
+.switch { text-align:center; margin-top:14px; font-size:13px; color:#a99ec9; }
+.switch a { color:#c084fc; cursor:pointer; }
+.err { color:#f87171; font-size:13px; text-align:center; margin-top:8px; min-height:18px; }
+
+.footer { text-align:center; color:#6d6288; font-size:12px; margin-top:30px; }
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="header">
-    <h1>工具箱</h1>
-    <div class="header-btns" id="headerBtns"></div>
-  </div>
-
-  <!-- 公告滚动栏 -->
-  <div class="announce-wrap">
-    <div class="announce-label">📢 公告</div>
-    <div class="announce-track">
-      <div class="announce-inner" id="annoInner">暂无公告</div>
+<div class="wrap">
+  <div class="topbar">
+    <div class="logo">工具箱</div>
+    <div class="topbtns" id="topbtns">
+      <button class="btn-login" id="btnLogin" onclick="showLogin()">登录</button>
+      <button class="btn-admin" onclick="location.href='admin.html'">管理</button>
     </div>
   </div>
 
-  <div class="card-list" id="cardList"></div>
+  <div class="announce">
+    <div class="announce-title">📢 公告</div>
+    <div class="announce-track"><span class="marquee" id="marquee">正在加载公告...</span></div>
+  </div>
+
+  <div class="cards">
+    <a class="card card-cyan" href="download.html">
+      <div class="icon">📦</div>
+      <div class="info"><h2>网盘工具</h2><p>下载各类实用工具包</p></div>
+      <div class="arrow">›</div>
+    </a>
+    <a class="card card-pink" href="music.html">
+      <div class="icon">🎵</div>
+      <div class="info"><h2>音乐播放器</h2><p>在线听歌 · 歌词 · 收藏</p></div>
+      <div class="arrow">›</div>
+    </a>
+    <div class="card card-gray">
+      <div class="icon">⚙️</div>
+      <div class="info"><h2>更多工具</h2><p>敬请期待</p></div>
+      <div class="arrow">›</div>
+    </div>
+  </div>
+
+  <div class="footer">LHB 工具箱 © 2026</div>
 </div>
 
-<!-- 登录模态框 -->
-<div class="modal" id="loginModal">
+<!-- 登录弹窗 -->
+<div class="modal-mask" id="loginModal">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
-    <h3>用户登录</h3>
-    <input type="text" id="loginUser" placeholder="用户名">
-    <input type="password" id="loginPass" placeholder="密码">
-    <button class="btn-primary" onclick="doLogin()">登录</button>
-    <div class="msg" id="loginMsg"></div>
+    <button class="close-x" id="closeLogin">✕</button>
+    <h3>登录</h3>
+    <div class="field"><label>用户名</label><input id="loginUser" placeholder="请输入用户名" autocomplete="off"></div>
+    <div class="field"><label>密码</label><input id="loginPass" type="password" placeholder="请输入密码"></div>
+    <div class="err" id="loginErr"></div>
+    <button class="modal-btn" onclick="doLogin()">登 录</button>
+    <div class="switch">没有账号？<a onclick="showReg()">立即注册</a></div>
   </div>
 </div>
 
-<!-- 公告详情模态框 -->
-<div class="modal" id="annoModal">
+<!-- 注册弹窗 -->
+<div class="modal-mask" id="regModal">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('annoModal')">&times;</button>
-    <h3 id="annoTitle">公告</h3>
-    <div class="announce-content" id="annoBody"></div>
+    <button class="close-x" id="closeReg">✕</button>
+    <h3>注册</h3>
+    <div class="field"><label>用户名</label><input id="regUser" placeholder="请输入用户名"></div>
+    <div class="field"><label>密码</label><input id="regPass" type="password" placeholder="请输入密码"></div>
+    <div class="err" id="regErr"></div>
+    <button class="modal-btn" onclick="doReg()">注 册</button>
+    <div class="switch">已有账号？<a onclick="showLogin()">去登录</a></div>
   </div>
 </div>
 
 <script>
-const API = 'https://sb.lhb2009.cc.cd';
+const API='https://sb.lhb2009.cc.cd';
 
-const tools = [
-  { name:'网盘工具', icon:'📦', page:'download.html', cls:'card-cyan' },
-  { name:'音乐播放器', icon:'🎵', page:'music.html', cls:'card-purple' },
-  { name:'更多工具', icon:'⚙️', page:'', cls:'card-gray', disabled:true }
-];
+// 公告加载
+async function loadAnnouncements(){
+  try{
+    const r=await fetch(API+'/announcement');
+    const data=await r.json();
+    const list=(data&&data.list)||[];
+    const marquee=document.getElementById('marquee');
+    if(list.length){
+      marquee.textContent='📢 '+list.map(a=>a.content).join('　　·　　');
+    } else {
+      marquee.textContent='欢迎使用工具箱！';
+    }
+  }catch(e){
+    document.getElementById('marquee').textContent='欢迎使用工具箱！';
+  }
+}
 
-let currentUser = null;
-let announcements = [];
-
-function checkLogin() {
-  const u = localStorage.getItem('lhb_user');
-  const btns = document.getElementById('headerBtns');
-  if (u) {
-    currentUser = JSON.parse(u);
-    btns.innerHTML = `
-      <span id="userBadge">👤 ${currentUser.username}</span>
+// 登录状态
+function updateLoginUI(){
+  const u=localStorage.getItem('lhb_user');
+  const box=document.getElementById('topbtns');
+  if(u){
+    box.innerHTML=`<span class="username">${u}</span>
       <button class="btn-logout" onclick="logout()">退出</button>
       <button class="btn-admin" onclick="location.href='admin.html'">管理</button>`;
   } else {
-    btns.innerHTML = `
-      <button class="btn-login" onclick="openLogin()">登录</button>
+    box.innerHTML=`<button class="btn-login" onclick="showLogin()">登录</button>
       <button class="btn-admin" onclick="location.href='admin.html'">管理</button>`;
   }
 }
+function logout(){ localStorage.removeItem('lhb_user'); updateLoginUI(); alert('已退出登录'); }
 
-function logout() {
-  localStorage.removeItem('lhb_user');
-  currentUser = null;
-  checkLogin();
-}
+// 登录/注册
+function showLogin(){ document.getElementById('regModal').classList.remove('show'); document.getElementById('loginModal').classList.add('show'); }
+function showReg(){ document.getElementById('loginModal').classList.remove('show'); document.getElementById('regModal').classList.add('show'); }
+document.getElementById('closeLogin').onclick=()=>document.getElementById('loginModal').classList.remove('show');
+document.getElementById('closeReg').onclick=()=>document.getElementById('regModal').classList.remove('show');
+document.getElementById('loginModal').addEventListener('click',e=>{ if(e.target.id==='loginModal')e.target.classList.remove('show'); });
+document.getElementById('regModal').addEventListener('click',e=>{ if(e.target.id==='regModal')e.target.classList.remove('show'); });
 
-function renderCards() {
-  const list = document.getElementById('cardList');
-  list.innerHTML = '';
-  tools.forEach(t => {
-    const div = document.createElement('div');
-    div.className = 'func-card ' + t.cls + (t.disabled ? ' disabled' : '');
-    div.innerHTML = `
-      <div class="icon">${t.icon}</div>
-      <div class="name">${t.name}</div>
-      <div class="arrow">›</div>`;
-    div.onclick = () => { if (!t.disabled) location.href = t.page; };
-    list.appendChild(div);
-  });
-}
-
-// 加载公告
-async function loadAnnouncements() {
-  const inner = document.getElementById('annoInner');
-  try {
-    const res = await fetch(`${API}/announcement`);
-    const data = await res.json();
-    if ((data.code === 0 || data.success) && (data.data||data.list||[]).length > 0) {
-      announcements = data.data || data.list;
-      const items = announcements.map(a =>
-        `<span class="anno-item" onclick="showAnno(${a.id})"><span class="tag">📢</span>${escapeHtml(a.title)}</span>`
-      ).join('');
-      inner.innerHTML = items + items;
+async function doLogin(){
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value;
+  const err=document.getElementById('loginErr');
+  if(!u||!p){ err.textContent='请填写用户名和密码'; return; }
+  try{
+    const r=await fetch(API+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+    const data=await r.json();
+    if(data&&data.ok){
+      localStorage.setItem('lhb_user',u);
+      err.textContent='';
+      document.getElementById('loginModal').classList.remove('show');
+      updateLoginUI();
+      alert('登录成功，欢迎 '+u+'！');
     } else {
-      inner.innerHTML = '暂无公告';
-      inner.style.animation = 'none';
+      err.textContent=(data&&data.msg)||'用户名或密码错误';
     }
-  } catch(e) {
-    inner.innerHTML = '暂无公告';
-    inner.style.animation = 'none';
-  }
+  }catch(e){ err.textContent='网络错误，请重试'; }
 }
+document.getElementById('loginPass').addEventListener('keydown',e=>{ if(e.key==='Enter')doLogin(); });
 
-function escapeHtml(s) {
-  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'"',"'":'&#39;'}[c]));
-}
-
-function showAnno(id) {
-  const a = announcements.find(x => x.id === id);
-  if (!a) return;
-  document.getElementById('annoTitle').textContent = a.title || '公告';
-  document.getElementById('annoBody').textContent = a.content || '';
-  document.getElementById('annoModal').classList.add('show');
-}
-
-function openLogin() { document.getElementById('loginModal').classList.add('show'); }
-function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-
-async function doLogin() {
-  const u = document.getElementById('loginUser').value.trim();
-  const p = document.getElementById('loginPass').value;
-  const msg = document.getElementById('loginMsg');
-  if (!u || !p) { msg.className='msg err'; msg.textContent='请输入用户名和密码'; return; }
-  try {
-    const res = await fetch(`${API}/login`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({username:u, password:p})
-    });
-    const data = await res.json();
-    if (data.code === 0 || data.success) {
-      currentUser = {username:u};
-      localStorage.setItem('lhb_user', JSON.stringify(currentUser));
-      msg.className='msg ok'; msg.textContent='登录成功';
-      setTimeout(()=>{ closeModal('loginModal'); checkLogin(); }, 600);
+async function doReg(){
+  const u=document.getElementById('regUser').value.trim();
+  const p=document.getElementById('regPass').value;
+  const err=document.getElementById('regErr');
+  if(!u||!p){ err.textContent='请填写用户名和密码'; return; }
+  try{
+    const r=await fetch(API+'/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+    const data=await r.json();
+    if(data&&data.ok){
+      localStorage.setItem('lhb_user',u);
+      err.textContent='';
+      document.getElementById('regModal').classList.remove('show');
+      updateLoginUI();
+      alert('注册成功，已自动登录！');
     } else {
-      msg.className='msg err'; msg.textContent = data.message || '登录失败';
+      err.textContent=(data&&data.msg)||'注册失败';
     }
-  } catch(e) { msg.className='msg err'; msg.textContent='网络错误'; }
+  }catch(e){ err.textContent='网络错误，请重试'; }
 }
 
-document.querySelectorAll('.modal').forEach(m => {
-  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });
-});
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') document.querySelectorAll('.modal').forEach(m => m.classList.remove('show'));
-});
-
-checkLogin();
-renderCards();
+updateLoginUI();
 loadAnnouncements();
 </script>
 </body>
