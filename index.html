@@ -2,798 +2,437 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>LHB 工具箱</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
+* { margin:0; padding:0; box-sizing:border-box; }
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(180deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  color: #e8e8f0;
 }
+.container { max-width: 900px; margin: 0 auto; padding: 16px; }
 
-.container {
-    width: 100%;
-    max-width: 560px;
-    text-align: center;
+/* 顶部 */
+.header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 20px 4px 16px;
 }
-
-/* ===== 顶部栏 ===== */
-.topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+.header h1 {
+  font-size: 26px; font-weight: 700;
+  background: linear-gradient(90deg, #7c8cff, #a78bfa);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
-
-.logo {
-    color: #fff;
-    font-size: 1.8rem;
-    font-weight: 600;
-    letter-spacing: 2px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+.header-btns { display: flex; gap: 10px; }
+.header-btns button {
+  padding: 8px 18px; border-radius: 20px; border: none; cursor: pointer;
+  font-size: 14px; font-weight: 600; transition: all .2s;
 }
+.btn-login { background: rgba(255,255,255,.1); color: #e8e8f0; }
+.btn-login:hover { background: rgba(255,255,255,.2); }
+.btn-admin { background: linear-gradient(135deg, #7c8cff, #a78bfa); color: #fff; }
+.btn-admin:hover { filter: brightness(1.1); }
 
-.topbar-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+/* 功能卡片 */
+.card-list { display: flex; flex-direction: column; gap: 18px; padding-top: 8px; }
+.func-card {
+  display: flex; align-items: center; gap: 20px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 20px; padding: 32px 28px; cursor: pointer;
+  transition: all .25s; width: 100%;
 }
+.func-card:hover { background: rgba(255,255,255,.1); transform: translateY(-2px); }
+.func-card .icon { font-size: 44px; }
+.func-card .info { flex: 1; }
+.func-card .info h2 { font-size: 22px; margin-bottom: 6px; }
+.func-card .info p { font-size: 14px; color: rgba(232,232,240,.6); }
+.func-card .arrow { font-size: 24px; color: rgba(232,232,240,.4); }
+.func-card.disabled { opacity: .5; cursor: not-allowed; }
+.func-card.disabled:hover { transform: none; background: rgba(255,255,255,.06); }
 
-.topbar-right .user-name {
-    color: #fff;
-    font-size: 0.9rem;
-    font-weight: 500;
-    background: rgba(255,255,255,0.2);
-    padding: 6px 12px;
-    border-radius: 8px;
-}
-
-/* ===== 按钮 ===== */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-}
-
-.btn-small { padding: 6px 12px; font-size: 0.8rem; }
-
-.btn-primary {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: #fff;
-}
-.btn-primary:hover { transform: translateY(-2px); }
-
-.btn-danger { background: #f5576c; color: #fff; }
-.btn-danger:hover { transform: translateY(-2px); }
-
-.btn-ghost { background: rgba(255,255,255,0.2); color: #fff; }
-.btn-ghost:hover { background: rgba(255,255,255,0.35); }
-
-.btn-ghost-dark { background: #eee; color: #333; }
-.btn-ghost-dark:hover { background: #ddd; }
-
-.btn-success { background: #4caf50; color: #fff; }
-.btn-success:hover { transform: translateY(-2px); }
-
-/* ===== 公告滚动横幅 ===== */
-.announcement-banner {
-    background: rgba(255,255,255,0.95);
-    border-radius: 12px;
-    padding: 10px 14px;
-    margin-bottom: 24px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    overflow: hidden;
-}
-
-.announcement-banner .tag {
-    flex-shrink: 0;
-    background: linear-gradient(135deg, #f093fb, #f5576c);
-    color: #fff;
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: 6px;
-    letter-spacing: 1px;
-}
-
-.announcement-banner .marquee-wrap {
-    flex: 1;
-    overflow: hidden;
-    position: relative;
-    height: 24px;
-}
-
-.announcement-banner .marquee {
-    display: inline-block;
-    white-space: nowrap;
-    animation: marquee 20s linear infinite;
-    cursor: pointer;
-    color: #333;
-    font-size: 0.9rem;
-    line-height: 24px;
-}
-
-.announcement-banner .marquee:hover { animation-play-state: paused; }
-
-.announcement-banner .marquee span {
-    margin-right: 60px;
-    color: #333;
-}
-
-.announcement-banner .marquee span .dot {
-    color: #f5576c;
-    margin-right: 6px;
-}
-
-@keyframes marquee {
-    0% { transform: translateX(100%); }
-    100% { transform: translateX(-100%); }
-}
-
-/* 无公告 */
-.announcement-banner .empty-msg {
-    color: #999;
-    font-size: 0.9rem;
-    line-height: 24px;
-}
-
-/* ===== 功能卡片 ===== */
-.cards {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 24px;
-}
-
-.card {
-    width: 100%;
-    height: 70px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    text-decoration: none;
-    font-size: 1.05rem;
-    font-weight: 500;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    cursor: pointer;
-}
-
-.card.active {
-    background: rgba(255,255,255,0.95);
-    color: #333;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-}
-.card.active:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-}
-
-.card.disabled {
-    background: rgba(255,255,255,0.25);
-    color: rgba(255,255,255,0.5);
-    cursor: not-allowed;
-    box-shadow: none;
-}
-
-.card .icon { font-size: 1.6rem; }
-.card.disabled .icon,
-.card.disabled .label { filter: grayscale(1); opacity: 0.7; }
-
-/* ===== 管理后台 ===== */
-.admin-panel {
-    background: rgba(255,255,255,0.95);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 24px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-    text-align: left;
-}
-
-.admin-panel h2 {
-    color: #333;
-    font-size: 1.1rem;
-    margin-bottom: 14px;
-}
-
-.admin-panel .section {
-    margin-bottom: 20px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid #eee;
-}
-.admin-panel .section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-
-.admin-panel .section h3 {
-    color: #333;
-    font-size: 0.95rem;
-    margin-bottom: 10px;
-}
-
-.admin-panel input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    margin-bottom: 10px;
-}
-.admin-panel input:focus {
-    outline: none;
-    border-color: #667eea;
-}
-
-.admin-panel .row { display: flex; gap: 8px; }
-.admin-panel .row input { flex: 1; }
-
-/* 用户列表 */
-.user-list {
-    max-height: 260px;
-    overflow-y: auto;
-}
-
-.user-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 12px;
-    border-radius: 8px;
-    background: #f7f7f9;
-    margin-bottom: 8px;
-    gap: 8px;
-}
-
-.user-item .info { flex: 1; min-width: 0; }
-.user-item .info .uname {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #333;
-}
-.user-item .info .utime {
-    font-size: 0.75rem;
-    color: #999;
-}
-.user-item .ops { display: flex; gap: 6px; flex-shrink: 0; }
-
-/* ===== 模态框 ===== */
-.modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-.modal-overlay.show { display: flex; }
-
+/* 模态框 */
 .modal {
-    background: #fff;
-    border-radius: 14px;
-    padding: 24px;
-    width: 100%;
-    max-width: 380px;
-    max-height: 80vh;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  display: none; position: fixed; inset: 0; z-index: 100;
+  background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
+  align-items: center; justify-content: center; padding: 16px;
+}
+.modal.show { display: flex; }
+.modal-box {
+  background: #1a1a2e; border: 1px solid rgba(255,255,255,.1);
+  border-radius: 18px; width: 100%; max-width: 420px;
+  max-height: 85vh; overflow-y: auto; padding: 24px;
+}
+.modal-box h3 { font-size: 18px; margin-bottom: 18px; }
+.modal-close {
+  float: right; background: none; border: none; color: rgba(255,255,255,.5);
+  font-size: 22px; cursor: pointer;
 }
 
-.modal h3 {
-    color: #333;
-    font-size: 1.15rem;
-    margin-bottom: 16px;
-    flex-shrink: 0;
+/* 标签页 */
+.tabs { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
+.tab-btn {
+  padding: 8px 14px; border-radius: 16px; border: none; cursor: pointer;
+  background: rgba(255,255,255,.08); color: #e8e8f0; font-size: 13px;
+  transition: all .2s;
 }
+.tab-btn.active { background: linear-gradient(135deg, #7c8cff, #a78bfa); color:#fff; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
 
-.modal .modal-body {
-    flex: 1;
-    overflow-y: auto;
-    margin-bottom: 16px;
+/* 表单 */
+input[type="text"], input[type="password"] {
+  width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.06); color: #e8e8f0; font-size: 14px; margin-bottom: 12px; outline: none;
 }
+input:focus { border-color: #7c8cff; }
+textarea {
+  width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.06); color: #e8e8f0; font-size: 14px; margin-bottom: 12px; outline: none;
+  resize: vertical; min-height: 80px; font-family: inherit;
+}
+textarea:focus { border-color: #7c8cff; }
+.btn-primary {
+  width: 100%; padding: 13px; border: none; border-radius: 12px; cursor: pointer;
+  background: linear-gradient(135deg, #7c8cff, #a78bfa); color: #fff;
+  font-size: 15px; font-weight: 600; transition: all .2s;
+}
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-danger { background: linear-gradient(135deg, #ff6b6b, #ee5a24); }
+.btn-small {
+  padding: 6px 12px; border: none; border-radius: 8px; cursor: pointer;
+  background: rgba(255,255,255,.1); color: #e8e8f0; font-size: 12px; margin: 2px;
+}
+.btn-small.danger { background: rgba(255,80,80,.2); color:#ff8a8a; }
 
-.modal .modal-body .ann-content {
-    color: #555;
-    font-size: 0.95rem;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    word-break: break-word;
+/* 列表项 */
+.list-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 6px; border-bottom: 1px solid rgba(255,255,255,.06);
 }
+.list-item .info { flex: 1; }
+.list-item .info .name { font-size: 14px; }
+.list-item .info .sub { font-size: 12px; color: rgba(232,232,240,.5); }
+.msg { font-size: 13px; margin-top: 10px; padding: 8px; border-radius: 8px; display:none; }
+.msg.ok { display:block; background: rgba(80,200,120,.15); color:#7edba0; }
+.msg.err { display:block; background: rgba(255,80,80,.15); color:#ff8a8a; }
 
-.modal .modal-body .ann-time {
-    color: #999;
-    font-size: 0.8rem;
-    margin-top: 12px;
-}
-
-.modal input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 1rem;
-    margin-bottom: 12px;
-}
-.modal input:focus {
-    outline: none;
-    border-color: #667eea;
-}
-
-.modal .modal-actions {
-    display: flex;
-    gap: 10px;
-    flex-shrink: 0;
-}
-.modal .modal-actions .btn { flex: 1; }
-
-.modal .error-msg {
-    color: #f5576c;
-    font-size: 0.85rem;
-    margin-bottom: 10px;
-    min-height: 16px;
-}
-
-/* ===== Toast ===== */
-.toast {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-100px);
-    background: rgba(0,0,0,0.8);
-    color: #fff;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    z-index: 2000;
-    transition: transform 0.3s ease;
-    pointer-events: none;
-}
-.toast.show { transform: translateX(-50%) translateY(0); }
-
-@media (max-width: 480px) {
-    .logo { font-size: 1.5rem; }
-    .btn { padding: 7px 12px; font-size: 0.8rem; }
-    .user-item { flex-direction: column; align-items: stretch; }
-    .user-item .ops { justify-content: flex-end; }
-}
+/* 登录态提示 */
+#userBadge { font-size: 13px; color: rgba(232,232,240,.7); margin-top: 8px; }
 </style>
 </head>
 <body>
-
 <div class="container">
+  <div class="header">
+    <h1>LHB 工具箱</h1>
+    <div class="header-btns">
+      <button class="btn-login" onclick="openLogin()">登录</button>
+      <button class="btn-admin" onclick="openAdmin()">管理</button>
+    </div>
+  </div>
+  <div id="userBadge"></div>
 
-    <!-- 顶部栏 -->
-    <div class="topbar">
-        <span class="logo">我的工具箱</span>
-        <div class="topbar-right" id="topbarRight">
-            <button class="btn btn-ghost" id="loginBtn" onclick="showUserLogin()">登录</button>
-            <button class="btn btn-ghost" id="adminBtn" onclick="showAdminLogin()">管理</button>
-        </div>
+  <div class="card-list">
+    <div class="func-card" onclick="location.href='download.html'">
+      <div class="icon">📦</div>
+      <div class="info">
+        <h2>网盘工具</h2>
+        <p>下载各类工具包</p>
+      </div>
+      <div class="arrow">›</div>
     </div>
 
-    <!-- 公告滚动横幅 -->
-    <div class="announcement-banner">
-        <span class="tag">公告</span>
-        <div class="marquee-wrap" id="marqueeWrap">
-            <div class="empty-msg" id="annEmpty">暂无公告</div>
-        </div>
+    <div class="func-card" onclick="location.href='music.html'">
+      <div class="icon">🎵</div>
+      <div class="info">
+        <h2>音乐播放器</h2>
+        <p>在线听歌，收藏与播放</p>
+      </div>
+      <div class="arrow">›</div>
     </div>
 
-    <!-- 功能卡片 -->
-    <div class="cards">
-        <a href="download.html" class="card active">
-            <span class="icon">📦</span>
-            <span class="label">网盘工具</span>
-        </a>
-        <div class="card disabled" onclick="return false;">
-            <span class="icon">🎵</span>
-            <span class="label">音乐播放器</span>
-        </div>
-        <div class="card disabled" onclick="return false;">
-            <span class="icon">⚙️</span>
-            <span class="label">其他工具</span>
-        </div>
+    <div class="func-card disabled">
+      <div class="icon">🧰</div>
+      <div class="info">
+        <h2>更多工具</h2>
+        <p>敬请期待</p>
+      </div>
+      <div class="arrow">›</div>
     </div>
-
-    <!-- 管理后台（管理员登录后显示） -->
-    <div class="admin-panel" id="adminPanel" style="display:none;">
-        <h2>🔧 管理后台</h2>
-
-        <!-- 注册新用户 -->
-        <div class="section">
-            <h3>注册新用户</h3>
-            <input type="text" id="regUsername" placeholder="用户名">
-            <input type="password" id="regPassword" placeholder="密码">
-            <button class="btn btn-primary" style="width:100%;" onclick="registerUser()">注册</button>
-        </div>
-
-        <!-- 用户列表 -->
-        <div class="section">
-            <h3>用户列表</h3>
-            <div class="user-list" id="userList"></div>
-        </div>
-
-        <!-- 退出管理 -->
-        <button class="btn btn-danger" style="width:100%;" onclick="adminLogout()">退出管理</button>
-    </div>
-
+  </div>
 </div>
 
-<!-- ===== 公告详情模态框 ===== -->
-<div class="modal-overlay" id="annModal">
-    <div class="modal">
-        <h3>📢 公告</h3>
-        <div class="modal-body">
-            <div class="ann-content" id="annDetailContent"></div>
-            <div class="ann-time" id="annDetailTime"></div>
-        </div>
-        <div class="modal-actions">
-            <button class="btn btn-ghost-dark" onclick="closeAnnModal()">关闭</button>
-        </div>
-    </div>
+<!-- 登录模态框 -->
+<div class="modal" id="loginModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
+    <h3>用户登录</h3>
+    <input type="text" id="loginUser" placeholder="用户名">
+    <input type="password" id="loginPass" placeholder="密码">
+    <button class="btn-primary" onclick="doLogin()">登录</button>
+    <div class="msg" id="loginMsg"></div>
+  </div>
 </div>
 
-<!-- ===== 用户登录模态框 ===== -->
-<div class="modal-overlay" id="userLoginModal">
-    <div class="modal">
-        <h3>用户登录</h3>
-        <div class="error-msg" id="userLoginError"></div>
-        <input type="text" id="userLoginName" placeholder="用户名">
-        <input type="password" id="userLoginPass" placeholder="密码" onkeydown="if(event.key==='Enter')doUserLogin()">
-        <div class="modal-actions">
-            <button class="btn btn-primary" onclick="doUserLogin()">登录</button>
-            <button class="btn btn-ghost-dark" onclick="closeModal('userLoginModal')">取消</button>
-        </div>
+<!-- 管理模态框 -->
+<div class="modal" id="adminModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('adminModal')">&times;</button>
+    <h3>管理后台</h3>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('tab-announce',this)">📢 发布公告</button>
+      <button class="tab-btn" onclick="switchTab('tab-register',this)">👤 注册用户</button>
+      <button class="tab-btn" onclick="switchTab('tab-users',this)">👥 用户列表</button>
+      <button class="tab-btn" onclick="switchTab('tab-requests',this)">🎵 歌曲请求</button>
     </div>
-</div>
 
-<!-- ===== 管理员登录模态框 ===== -->
-<div class="modal-overlay" id="adminLoginModal">
-    <div class="modal">
-        <h3>管理员登录</h3>
-        <div class="error-msg" id="adminLoginError"></div>
-        <input type="password" id="adminLoginPass" placeholder="请输入管理密码" onkeydown="if(event.key==='Enter')doAdminLogin()">
-        <div class="modal-actions">
-            <button class="btn btn-primary" onclick="doAdminLogin()">确认</button>
-            <button class="btn btn-ghost-dark" onclick="closeModal('adminLoginModal')">取消</button>
-        </div>
+    <!-- 发布公告 -->
+    <div class="tab-panel active" id="tab-announce">
+      <input type="password" id="adminPass" placeholder="管理员密码">
+      <input type="text" id="annTitle" placeholder="公告标题">
+      <textarea id="annContent" placeholder="公告内容"></textarea>
+      <button class="btn-primary" onclick="publishAnnounce()">发布</button>
+      <div class="msg" id="annMsg"></div>
     </div>
-</div>
 
-<!-- ===== 编辑用户模态框 ===== -->
-<div class="modal-overlay" id="editUserModal">
-    <div class="modal">
-        <h3>编辑用户</h3>
-        <div class="error-msg" id="editUserError"></div>
-        <input type="text" id="editUserId" style="display:none;">
-        <input type="text" id="editUsername" placeholder="用户名">
-        <input type="password" id="editPassword" placeholder="新密码">
-        <div class="modal-actions">
-            <button class="btn btn-primary" onclick="saveEditUser()">保存</button>
-            <button class="btn btn-ghost-dark" onclick="closeModal('editUserModal')">取消</button>
-        </div>
+    <!-- 注册用户 -->
+    <div class="tab-panel" id="tab-register">
+      <input type="password" id="adminPass2" placeholder="管理员密码">
+      <input type="text" id="regUser" placeholder="用户名">
+      <input type="password" id="regPass" placeholder="密码">
+      <button class="btn-primary" onclick="registerUser()">注册</button>
+      <div class="msg" id="regMsg"></div>
     </div>
-</div>
 
-<!-- Toast -->
-<div class="toast" id="toast"></div>
+    <!-- 用户列表 -->
+    <div class="tab-panel" id="tab-users">
+      <input type="password" id="adminPass3" placeholder="管理员密码">
+      <button class="btn-primary" style="margin-bottom:12px" onclick="loadUsers()">加载用户列表</button>
+      <div id="userList"></div>
+      <div class="msg" id="usersMsg"></div>
+    </div>
+
+    <!-- 歌曲请求 -->
+    <div class="tab-panel" id="tab-requests">
+      <input type="password" id="adminPass4" placeholder="管理员密码">
+      <button class="btn-primary" style="margin-bottom:12px" onclick="loadRequests()">加载歌曲请求</button>
+      <div id="reqList"></div>
+      <div class="msg" id="reqMsg"></div>
+    </div>
+  </div>
+</div>
 
 <script>
-// ============ 常量 ============
 const API = 'https://sb.lhb2009.cc.cd';
+let currentUser = null;
 
-// ============ 状态 ============
-let currentUser = null;       // 当前登录的普通用户
-let isAdmin = false;          // 是否管理员
-let adminPass = '';           // 管理员密码（内存中）
-let announcements = [];       // 公告列表
-
-// ============ Toast ============
-let toastTimer;
-function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+// 检查登录态
+function checkLogin() {
+  const u = localStorage.getItem('lhb_user');
+  if (u) {
+    currentUser = JSON.parse(u);
+    const badge = document.getElementById('userBadge');
+    badge.textContent = '已登录：' + currentUser.username;
+  }
 }
 
-// ============ 模态框 ============
+function openLogin() { showModal('loginModal'); }
+function openAdmin() { showModal('adminModal'); }
+
 function showModal(id) { document.getElementById(id).classList.add('show'); }
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-function closeAnnModal() { closeModal('annModal'); }
-
-// ============ 公告获取 ============
-async function fetchAnnouncements() {
-    try {
-        const res = await fetch(API + '/announcement');
-        const data = await res.json();
-        if (data.code === 0 && Array.isArray(data.data) && data.data.length > 0) {
-            announcements = data.data;
-            renderMarquee();
-        } else {
-            announcements = [];
-            renderMarquee();
-        }
-    } catch (e) {
-        announcements = [];
-        renderMarquee();
-    }
+function switchTab(panel, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(panel).classList.add('active');
+  btn.classList.add('active');
 }
 
-function renderMarquee() {
-    const wrap = document.getElementById('marqueeWrap');
-    if (announcements.length === 0) {
-        wrap.innerHTML = '<div class="empty-msg">暂无公告</div>';
-        return;
-    }
-    // 拼接所有公告标题，重复一份实现无缝滚动
-    const texts = announcements.map(a => '<span onclick="showAnnDetail(' + a.id + ')"><span class="dot">●</span>' + escapeHtml(a.title) + '</span>').join('');
-    wrap.innerHTML = '<div class="marquee">' + texts + texts + '</div>';
-}
-
-function escapeHtml(str) {
-    return String(str || '').replace(/[&<>"']/g, function(c) {
-        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'"',"'":'&#39;'}[c];
+// 用户登录
+async function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const msg = document.getElementById('loginMsg');
+  if (!u || !p) { msg.className='msg err'; msg.textContent='请输入用户名和密码'; return; }
+  try {
+    const res = await fetch(`${API}/login`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({username:u, password:p})
     });
-}
-
-function showAnnDetail(id) {
-    const ann = announcements.find(a => a.id === id);
-    if (!ann) return;
-    document.getElementById('annDetailContent').textContent = ann.content || '';
-    document.getElementById('annDetailTime').textContent = '发布于：' + (ann.time || '');
-    showModal('annModal');
-}
-
-// ============ 用户登录 ============
-function showUserLogin() {
-    document.getElementById('userLoginError').textContent = '';
-    document.getElementById('userLoginName').value = '';
-    document.getElementById('userLoginPass').value = '';
-    showModal('userLoginModal');
-}
-
-async function doUserLogin() {
-    const username = document.getElementById('userLoginName').value.trim();
-    const password = document.getElementById('userLoginPass').value;
-    if (!username || !password) {
-        document.getElementById('userLoginError').textContent = '请输入用户名和密码';
-        return;
-    }
-    try {
-        const res = await fetch(API + '/user/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        });
-        const data = await res.json();
-        if (data.code === 0) {
-            currentUser = username;
-            closeModal('userLoginModal');
-            renderTopbar();
-            showToast('登录成功');
-        } else {
-            document.getElementById('userLoginError').textContent = data.msg || '登录失败';
-        }
-    } catch (e) {
-        document.getElementById('userLoginError').textContent = '网络错误，请重试';
-    }
-}
-
-function logoutUser() {
-    currentUser = null;
-    renderTopbar();
-    showToast('已退出登录');
-}
-
-// ============ 顶部栏渲染 ============
-function renderTopbar() {
-    const right = document.getElementById('topbarRight');
-    if (currentUser) {
-        right.innerHTML = '<span class="user-name">' + escapeHtml(currentUser) + '</span>' +
-            '<button class="btn btn-ghost" onclick="logoutUser()">退出</button>';
+    const data = await res.json();
+    if (data.success) {
+      currentUser = {username:u};
+      localStorage.setItem('lhb_user', JSON.stringify(currentUser));
+      document.getElementById('userBadge').textContent = '已登录：' + u;
+      msg.className='msg ok'; msg.textContent='登录成功';
+      setTimeout(()=>closeModal('loginModal'), 600);
     } else {
-        right.innerHTML = '<button class="btn btn-ghost" onclick="showUserLogin()">登录</button>' +
-            '<button class="btn btn-ghost" onclick="showAdminLogin()">管理</button>';
+      msg.className='msg err'; msg.textContent = data.message || '登录失败';
     }
+  } catch(e) {
+    msg.className='msg err'; msg.textContent='网络错误：' + e.message;
+  }
 }
 
-// ============ 管理员登录 ============
-function showAdminLogin() {
-    document.getElementById('adminLoginError').textContent = '';
-    document.getElementById('adminLoginPass').value = '';
-    showModal('adminLoginModal');
-}
-
-async function doAdminLogin() {
-    const password = document.getElementById('adminLoginPass').value;
-    if (!password) {
-        document.getElementById('adminLoginError').textContent = '请输入密码';
-        return;
+// 发布公告
+async function publishAnnounce() {
+  const pass = document.getElementById('adminPass').value;
+  const title = document.getElementById('annTitle').value.trim();
+  const content = document.getElementById('annContent').value.trim();
+  const msg = document.getElementById('annMsg');
+  if (!pass || !title || !content) { msg.className='msg err'; msg.textContent='请填写完整信息'; return; }
+  try {
+    const res = await fetch(`${API}/announce`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({password:pass, title, content})
+    });
+    const data = await res.json();
+    if (data.success) {
+      msg.className='msg ok'; msg.textContent='公告发布成功';
+      document.getElementById('annTitle').value=''; document.getElementById('annContent').value='';
+    } else {
+      msg.className='msg err'; msg.textContent = data.message || '发布失败';
     }
-    try {
-        const res = await fetch(API + '/user/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Admin-Password': password
-            },
-            body: JSON.stringify({ username: 'admin', password })
-        });
-        const data = await res.json();
-        if (data.code === 0) {
-            isAdmin = true;
-            adminPass = password;
-            closeModal('adminLoginModal');
-            document.getElementById('adminPanel').style.display = 'block';
-            loadUsers();
-            showToast('管理员登录成功');
-        } else {
-            document.getElementById('adminLoginError').textContent = data.msg || '密码错误';
-        }
-    } catch (e) {
-        document.getElementById('adminLoginError').textContent = '网络错误，请重试';
-    }
+  } catch(e) { msg.className='msg err'; msg.textContent='网络错误：' + e.message; }
 }
 
-function adminLogout() {
-    isAdmin = false;
-    adminPass = '';
-    document.getElementById('adminPanel').style.display = 'none';
-    showToast('已退出管理');
-}
-
-// ============ 注册新用户 ============
+// 注册用户
 async function registerUser() {
-    const username = document.getElementById('regUsername').value.trim();
-    const password = document.getElementById('regPassword').value;
-    if (!username || !password) {
-        showToast('请输入用户名和密码');
-        return;
+  const pass = document.getElementById('adminPass2').value;
+  const u = document.getElementById('regUser').value.trim();
+  const p = document.getElementById('regPass').value;
+  const msg = document.getElementById('regMsg');
+  if (!pass || !u || !p) { msg.className='msg err'; msg.textContent='请填写完整信息'; return; }
+  try {
+    const res = await fetch(`${API}/register`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({password:pass, username:u, password2:p})
+    });
+    const data = await res.json();
+    if (data.success) {
+      msg.className='msg ok'; msg.textContent='用户注册成功';
+      document.getElementById('regUser').value=''; document.getElementById('regPass').value='';
+    } else {
+      msg.className='msg err'; msg.textContent = data.message || '注册失败';
     }
-    try {
-        const res = await fetch(API + '/user/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Admin-Password': adminPass
-            },
-            body: JSON.stringify({ username, password })
-        });
-        const data = await res.json();
-        if (data.code === 0) {
-            showToast('注册成功');
-            document.getElementById('regUsername').value = '';
-            document.getElementById('regPassword').value = '';
-            loadUsers();
-        } else {
-            showToast('注册失败：' + (data.msg || '未知错误'));
-        }
-    } catch (e) {
-        showToast('网络错误，请重试');
-    }
+  } catch(e) { msg.className='msg err'; msg.textContent='网络错误：' + e.message; }
 }
 
-// ============ 用户列表 ============
+// 加载用户列表
 async function loadUsers() {
-    try {
-        const res = await fetch(API + '/user/list', {
-            headers: { 'X-Admin-Password': adminPass }
-        });
-        const data = await res.json();
-        if (data.code === 0) {
-            renderUserList(data.data || []);
-        } else {
-            showToast('加载用户失败：' + (data.msg || ''));
-            if (data.msg === '未授权') adminLogout();
-        }
-    } catch (e) {
-        showToast('网络错误，请重试');
+  const pass = document.getElementById('adminPass3').value;
+  const msg = document.getElementById('usersMsg');
+  if (!pass) { msg.className='msg err'; msg.textContent='请输入管理员密码'; return; }
+  try {
+    const res = await fetch(`${API}/users?password=${encodeURIComponent(pass)}`);
+    const data = await res.json();
+    if (data.success) {
+      const list = document.getElementById('userList');
+      list.innerHTML = '';
+      (data.users||[]).forEach(u => {
+        const div = document.createElement('div');
+        div.className = 'list-item';
+        div.innerHTML = `
+          <div class="info">
+            <div class="name">${u.username}</div>
+            <div class="sub">${u.created_at||''}</div>
+          </div>
+          <div>
+            <button class="btn-small" onclick="editUser('${u.username}')">编辑</button>
+            <button class="btn-small danger" onclick="delUser('${u.username}')">删除</button>
+          </div>`;
+        list.appendChild(div);
+      });
+      msg.className='msg ok'; msg.textContent='加载成功';
+    } else {
+      msg.className='msg err'; msg.textContent = data.message || '加载失败';
     }
+  } catch(e) { msg.className='msg err'; msg.textContent='网络错误：' + e.message; }
 }
 
-function renderUserList(users) {
-    const list = document.getElementById('userList');
-    if (!users || users.length === 0) {
-        list.innerHTML = '<div class="empty-msg" style="color:#999;text-align:center;padding:16px;">暂无用户</div>';
-        return;
-    }
-    list.innerHTML = users.map(u =>
-        '<div class="user-item">' +
-            '<div class="info">' +
-                '<div class="uname">' + escapeHtml(u.username) + '</div>' +
-                '<div class="utime">注册时间：' + escapeHtml(u.created_at || '') + '</div>' +
-            '</div>' +
-            '<div class="ops">' +
-                '<button class="btn btn-small btn-primary" onclick="showEditUser(\'' + u.id + '\', \'' + escapeHtml(u.username).replace(/'/g, "\\'") + '\')">编辑</button>' +
-                '<button class="btn btn-small btn-danger" onclick="deleteUser(\'' + u.id + '\')">删除</button>' +
-            '</div>' +
-        '</div>'
-    ).join('');
+async function editUser(username) {
+  const newPass = prompt(`编辑用户 ${username} 的新密码：`);
+  if (!newPass) return;
+  const pass = document.getElementById('adminPass3').value;
+  try {
+    const res = await fetch(`${API}/users/${username}`, {
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({password:pass, newPassword:newPass})
+    });
+    const data = await res.json();
+    const msg = document.getElementById('usersMsg');
+    if (data.success) { msg.className='msg ok'; msg.textContent='修改成功'; loadUsers(); }
+    else { msg.className='msg err'; msg.textContent = data.message||'修改失败'; }
+  } catch(e) { msg.className='msg err'; msg.textContent='网络错误'; }
 }
 
-// ============ 编辑用户 ============
-function showEditUser(id, username) {
-    document.getElementById('editUserError').textContent = '';
-    document.getElementById('editUserId').value = id;
-    document.getElementById('editUsername').value = username;
-    document.getElementById('editPassword').value = '';
-    showModal('editUserModal');
+async function delUser(username) {
+  if (!confirm(`确定删除用户 ${username}？`)) return;
+  const pass = document.getElementById('adminPass3').value;
+  try {
+    const res = await fetch(`${API}/users/${username}`, {
+      method:'DELETE', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({password:pass})
+    });
+    const data = await res.json();
+    const msg = document.getElementById('usersMsg');
+    if (data.success) { msg.className='msg ok'; msg.textContent='删除成功'; loadUsers(); }
+    else { msg.className='msg err'; msg.textContent = data.message||'删除失败'; }
+  } catch(e) { msg.className='msg err'; msg.textContent='网络错误'; }
 }
 
-async function saveEditUser() {
-    const id = document.getElementById('editUserId').value;
-    const username = document.getElementById('editUsername').value.trim();
-    const password = document.getElementById('editPassword').value;
-    if (!username) {
-        document.getElementById('editUserError').textContent = '用户名不能为空';
-        return;
+// 加载歌曲请求
+async function loadRequests() {
+  const pass = document.getElementById('adminPass4').value;
+  const msg = document.getElementById('reqMsg');
+  if (!pass) { msg.className='msg err'; msg.textContent='请输入管理员密码'; return; }
+  try {
+    const res = await fetch(`${API}/requests?password=${encodeURIComponent(pass)}`);
+    const data = await res.json();
+    if (data.success) {
+      const list = document.getElementById('reqList');
+      list.innerHTML = '';
+      (data.requests||[]).forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'list-item';
+        div.innerHTML = `
+          <div class="info">
+            <div class="name">${r.song}</div>
+            <div class="sub">由 ${r.username} 提交</div>
+          </div>
+          <button class="btn-small danger" onclick="delRequest(${r.id})">删除</button>`;
+        list.appendChild(div);
+      });
+      msg.className='msg ok'; msg.textContent='加载成功';
+    } else {
+      msg.className='msg err'; msg.textContent = data.message || '加载失败';
     }
-    try {
-        const res = await fetch(API + '/user/update', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Admin-Password': adminPass
-            },
-            body: JSON.stringify({ id, username, password })
-        });
-        const data = await res.json();
-        if (data.code === 0) {
-            closeModal('editUserModal');
-            showToast('用户已更新');
-            loadUsers();
-        } else {
-            document.getElementById('editUserError').textContent = data.msg || '更新失败';
-        }
-    } catch (e) {
-        document.getElementById('editUserError').textContent = '网络错误，请重试';
-    }
+  } catch(e) { msg.className='msg err'; msg.textContent='网络错误：' + e.message; }
 }
 
-// ============ 删除用户 ============
-async function deleteUser(id) {
-    if (!confirm('确定要删除该用户吗？')) return;
-    try {
-        const res = await fetch(API + '/user/delete?id=' + id, {
-            method: 'DELETE',
-            headers: { 'X-Admin-Password': adminPass }
-        });
-        const data = await res.json();
-        if (data.code === 0) {
-            showToast('用户已删除');
-            loadUsers();
-        } else {
-            showToast('删除失败：' + (data.msg || ''));
-        }
-    } catch (e) {
-        showToast('网络错误，请重试');
-    }
+async function delRequest(id) {
+  const pass = document.getElementById('adminPass4').value;
+  try {
+    const res = await fetch(`${API}/requests/${id}`, {
+      method:'DELETE', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({password:pass})
+    });
+    const data = await res.json();
+    const msg = document.getElementById('reqMsg');
+    if (data.success) { msg.className='msg ok'; msg.textContent='删除成功'; loadRequests(); }
+    else { msg.className='msg err'; msg.textContent = data.message||'删除失败'; }
+  } catch(e) { msg.className='msg err'; msg.textContent='网络错误'; }
 }
 
-// ============ 初始化 ============
-renderTopbar();
-fetchAnnouncements();
+// 关闭弹窗按钮
+document.querySelectorAll('.modal').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.modal').forEach(m => m.classList.remove('show')); });
+
+checkLogin();
 </script>
-
 </body>
 </html>
