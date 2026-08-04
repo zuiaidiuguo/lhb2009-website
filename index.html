@@ -8,7 +8,7 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  background: linear-gradient(180deg, #0d1a2d 0%, #132b3a 50%, #1a2a3a 100%);
+  background: linear-gradient(135deg, #0d0d1a 0%, #1a0d2a 30%, #0d1a2d 65%, #132b3a 100%);
   background-attachment: fixed; min-height: 100vh; color: #e6f0fa;
 }
 .container { max-width: 720px; margin: 0 auto; padding: 16px; }
@@ -19,30 +19,39 @@ body {
   padding: 20px 4px 16px;
 }
 .header h1 {
-  font-size: 26px; font-weight: 700;
-  background: linear-gradient(90deg, #4f7cff, #00c6ff);
+  font-size: 28px; font-weight: 800;
+  background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #1dd1a1);
+  background-size: 200% auto;
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  animation: rainbow 3s linear infinite;
 }
-.header-btns { display: flex; gap: 10px; }
+@keyframes rainbow {
+  to { background-position: 200% center; }
+}
+.header-btns { display: flex; gap: 10px; align-items:center; }
 .header-btns button {
   padding: 8px 18px; border-radius: 20px; border: none; cursor: pointer;
   font-size: 14px; font-weight: 600; transition: all .2s;
 }
-.btn-login { background: rgba(79,124,255,.2); color: #e6f0fa; border:1px solid #2a4a5a; }
-.btn-login:hover { background: rgba(79,124,255,.35); }
-.btn-admin { background: linear-gradient(135deg, #4f7cff, #00c6ff); color: #fff; }
+.btn-login { background: linear-gradient(135deg, #48dbfb, #1dd1a1); color: #fff; }
+.btn-login:hover { filter: brightness(1.1); }
+.btn-admin { background: linear-gradient(135deg, #a55eea, #5f27cd); color: #fff; }
 .btn-admin:hover { filter: brightness(1.1); }
+.btn-logout { background: rgba(255,255,255,.1); color: #e6f0fa; border:1px solid #444; }
+.btn-logout:hover { background: rgba(255,255,255,.2); }
+#userBadge { font-size: 13px; color: #feca57; margin-right: 8px; }
 
-/* 公告滚动栏 */
+/* 公告栏 - 金色 */
 .announce-wrap {
-  position: relative; overflow: hidden; margin: 8px 0 22px;
-  background: rgba(20,60,80,.35); border: 1px solid #2a4a5a;
+  position: relative; overflow: hidden; margin: 8px 0 24px;
+  background: rgba(255,255,255,.06); border: 1px solid #feca57;
   border-radius: 12px; height: 44px; display:flex; align-items:center;
+  box-shadow: 0 0 15px rgba(254,202,87,.15);
 }
 .announce-label {
   flex-shrink:0; padding: 0 14px; font-size:13px; font-weight:600;
-  color:#00d4ff; border-right:1px solid #2a4a5a; height:100%;
-  display:flex; align-items:center; background: rgba(0,212,255,.08);
+  color:#feca57; border-right:1px solid #feca57; height:100%;
+  display:flex; align-items:center; background: rgba(254,202,87,.08);
 }
 .announce-track { flex:1; overflow:hidden; height:100%; }
 .announce-inner {
@@ -55,21 +64,29 @@ body {
   100% { transform: translateX(-100%); }
 }
 .anno-item { display:inline-flex; align-items:center; font-size:14px; color:#e6f0fa; cursor:pointer; }
-.anno-item:hover { color:#00d4ff; }
-.anno-item .tag { color:#00d4ff; margin-right:8px; }
+.anno-item:hover { color:#feca57; }
+.anno-item .tag { color:#feca57; margin-right:8px; }
 
 /* 功能卡片 */
-.card-list { display: flex; flex-direction: column; gap: 16px; align-items:center; }
+.card-list { display: flex; flex-direction: column; gap: 18px; align-items:center; }
 .func-card {
   display: flex; align-items: center; gap: 16px; width: 100%; max-width: 480px;
-  background: rgba(20,60,80,.3); border: 1px solid #2a4a5a;
-  border-radius: 16px; padding: 22px 24px; cursor: pointer;
+  background: rgba(255,255,255,.06); border-radius: 16px; padding: 26px 24px; cursor: pointer;
   transition: all .25s;
 }
-.func-card:hover { background: rgba(20,60,80,.5); border-color: #00d4ff; transform: translateY(-2px); }
-.func-card .icon { font-size: 34px; }
+.func-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,.35); }
+.func-card .icon { font-size: 36px; }
 .func-card .name { flex:1; font-size: 18px; font-weight:600; }
-.func-card .arrow { font-size: 22px; color: #8ab4d4; }
+.func-card .arrow { font-size: 22px; color: rgba(255,255,255,.5); }
+.func-card.disabled { opacity: .5; cursor: not-allowed; }
+.func-card.disabled:hover { transform:none; box-shadow:none; }
+
+/* 各卡片颜色边框 */
+.card-cyan { border: 2px solid #48dbfb; }
+.card-cyan:hover { box-shadow: 0 8px 25px rgba(72,219,251,.25); }
+.card-purple { border: 2px solid #a55eea; }
+.card-purple:hover { box-shadow: 0 8px 25px rgba(165,94,234,.25); }
+.card-gray { border: 2px solid #576574; }
 
 /* 模态框 */
 .modal {
@@ -79,29 +96,32 @@ body {
 }
 .modal.show { display:flex; }
 .modal-box {
-  background:#132b3a; border:1px solid #2a4a5a;
-  border-radius:18px; width:100%; max-width:380px; padding:24px;
+  background:#1a0d2a; border:1px solid #a55eea; border-radius:18px;
+  width:100%; max-width:380px; padding:24px;
 }
 .modal-close {
-  float:right; background:none; border:none; color:#8ab4d4; font-size:22px; cursor:pointer; line-height:1;
+  float:right; background:none; border:none; color:rgba(255,255,255,.5);
+  font-size:22px; cursor:pointer; line-height:1;
 }
-.modal-close:hover { color:#00d4ff; }
-.modal-box h3 { font-size:18px; margin-bottom:16px; }
+.modal-close:hover { color:#feca57; }
+.modal-box h3 { font-size:18px; margin-bottom:16px;
+  background: linear-gradient(90deg,#ff6b6b,#feca57);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
 input[type="text"], input[type="password"] {
-  width:100%; padding:12px 14px; border-radius:12px; border:1px solid #2a4a5a;
-  background: rgba(20,60,80,.3); color:#e6f0fa; font-size:14px; margin-bottom:12px; outline:none;
+  width:100%; padding:12px 14px; border-radius:12px; border:1px solid #444;
+  background: rgba(255,255,255,.08); color:#e6f0fa; font-size:14px; margin-bottom:12px; outline:none;
 }
-input:focus { border-color:#00d4ff; }
+input:focus { border-color:#48dbfb; }
 .btn-primary {
   width:100%; padding:13px; border:none; border-radius:12px; cursor:pointer;
-  background: linear-gradient(135deg, #4f7cff, #00c6ff); color:#fff;
-  font-size:15px; font-weight:600; transition: all .2s;
+  background: linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #1dd1a1);
+  background-size: 200% auto; color:#fff; font-size:15px; font-weight:600;
+  transition: all .3s;
 }
-.btn-primary:hover { filter:brightness(1.1); }
+.btn-primary:hover { background-position: right center; filter:brightness(1.05); }
 .msg { font-size:13px; margin-top:10px; padding:8px; border-radius:8px; display:none; }
 .msg.ok { display:block; background:rgba(80,200,120,.15); color:#7edba0; }
 .msg.err { display:block; background:rgba(255,80,80,.15); color:#ff8a8a; }
-#userBadge { font-size:13px; color:#8ab4d4; margin: 0 4px 8px; }
 .announce-content { font-size:14px; color:#e6f0fa; line-height:1.7; white-space:pre-wrap; }
 </style>
 </head>
@@ -109,12 +129,8 @@ input:focus { border-color:#00d4ff; }
 <div class="container">
   <div class="header">
     <h1>工具箱</h1>
-    <div class="header-btns">
-      <button class="btn-login" onclick="openLogin()">登录</button>
-      <button class="btn-admin" onclick="location.href='admin.html'">管理</button>
-    </div>
+    <div class="header-btns" id="headerBtns"></div>
   </div>
-  <div id="userBadge"></div>
 
   <!-- 公告滚动栏 -->
   <div class="announce-wrap">
@@ -152,18 +168,9 @@ input:focus { border-color:#00d4ff; }
 const API = 'https://sb.lhb2009.cc.cd';
 
 const tools = [
-  { name:'截屏.zip', icon:'📸', page:'download.html' },
-  { name:'解压.zip', icon:'🗜️', page:'download.html' },
-  { name:'硬件检测工具.zip', icon:'🔧', page:'download.html' },
-  { name:'win7激活工具.zip', icon:'💻', page:'download.html' },
-  { name:'全能激活工具.zip', icon:'⚡', page:'download.html' },
-  { name:'Dism++系统修复.zip', icon:'🛠️', page:'download.html' },
-  { name:'搞机工具箱11.1.2.7z', icon:'📦', page:'download.html' },
-  { name:'搜索工具.zip', icon:'🔍', page:'download.html' },
-  { name:'网络工具.zip', icon:'🌐', page:'download.html' },
-  { name:'复制文件工具.zip', icon:'📋', page:'download.html' },
-  { name:'误删文件恢复工具.zip', icon:'♻️', page:'download.html' },
-  { name:'音乐播放器', icon:'🎵', page:'music.html' }
+  { name:'网盘工具', icon:'📦', page:'download.html', cls:'card-cyan' },
+  { name:'音乐播放器', icon:'🎵', page:'music.html', cls:'card-purple' },
+  { name:'更多工具', icon:'⚙️', page:'', cls:'card-gray', disabled:true }
 ];
 
 let currentUser = null;
@@ -171,10 +178,24 @@ let announcements = [];
 
 function checkLogin() {
   const u = localStorage.getItem('lhb_user');
+  const btns = document.getElementById('headerBtns');
   if (u) {
     currentUser = JSON.parse(u);
-    document.getElementById('userBadge').textContent = '已登录：' + currentUser.username;
+    btns.innerHTML = `
+      <span id="userBadge">👤 ${currentUser.username}</span>
+      <button class="btn-logout" onclick="logout()">退出</button>
+      <button class="btn-admin" onclick="location.href='admin.html'">管理</button>`;
+  } else {
+    btns.innerHTML = `
+      <button class="btn-login" onclick="openLogin()">登录</button>
+      <button class="btn-admin" onclick="location.href='admin.html'">管理</button>`;
   }
+}
+
+function logout() {
+  localStorage.removeItem('lhb_user');
+  currentUser = null;
+  checkLogin();
 }
 
 function renderCards() {
@@ -182,12 +203,12 @@ function renderCards() {
   list.innerHTML = '';
   tools.forEach(t => {
     const div = document.createElement('div');
-    div.className = 'func-card';
+    div.className = 'func-card ' + t.cls + (t.disabled ? ' disabled' : '');
     div.innerHTML = `
       <div class="icon">${t.icon}</div>
       <div class="name">${t.name}</div>
       <div class="arrow">›</div>`;
-    div.onclick = () => location.href = t.page;
+    div.onclick = () => { if (!t.disabled) location.href = t.page; };
     list.appendChild(div);
   });
 }
@@ -198,8 +219,8 @@ async function loadAnnouncements() {
   try {
     const res = await fetch(`${API}/announcement`);
     const data = await res.json();
-    if (data.code === 0 && data.data && data.data.length > 0) {
-      announcements = data.data;
+    if ((data.code === 0 || data.success) && (data.data||data.list||[]).length > 0) {
+      announcements = data.data || data.list;
       const items = announcements.map(a =>
         `<span class="anno-item" onclick="showAnno(${a.id})"><span class="tag">📢</span>${escapeHtml(a.title)}</span>`
       ).join('');
@@ -243,9 +264,8 @@ async function doLogin() {
     if (data.code === 0 || data.success) {
       currentUser = {username:u};
       localStorage.setItem('lhb_user', JSON.stringify(currentUser));
-      document.getElementById('userBadge').textContent = '已登录：' + u;
       msg.className='msg ok'; msg.textContent='登录成功';
-      setTimeout(()=>closeModal('loginModal'), 600);
+      setTimeout(()=>{ closeModal('loginModal'); checkLogin(); }, 600);
     } else {
       msg.className='msg err'; msg.textContent = data.message || '登录失败';
     }

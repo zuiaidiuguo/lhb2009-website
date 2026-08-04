@@ -8,7 +8,7 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  background: linear-gradient(180deg, #0d1a2d 0%, #132b3a 50%, #1a2a3a 100%);
+  background: linear-gradient(135deg, #0d0d1a 0%, #1a0d2a 40%, #0d1a2d 100%);
   background-attachment: fixed; min-height: 100vh; color: #e6f0fa;
 }
 .container { max-width: 720px; margin: 0 auto; padding: 16px; }
@@ -16,39 +16,40 @@ body {
 .header { display:flex; align-items:center; gap:14px; padding: 20px 4px 16px; }
 .back-btn {
   width: 38px; height: 38px; border-radius: 50%; border:none; cursor:pointer;
-  background: rgba(20,60,80,.4); color:#e6f0fa; font-size:18px;
-  display:flex; align-items:center; justify-content:center; border:1px solid #2a4a5a;
+  background: rgba(255,255,255,.1); color:#e6f0fa; font-size:18px;
+  display:flex; align-items:center; justify-content:center;
 }
-.back-btn:hover { background: rgba(20,60,80,.6); }
+.back-btn:hover { background: rgba(255,255,255,.2); }
 .header h1 {
   font-size: 24px; font-weight:700;
-  background: linear-gradient(90deg, #4f7cff, #00c6ff);
+  background: linear-gradient(90deg, #a55eea, #48dbfb);
   -webkit-background-clip:text; -webkit-text-fill-color:transparent;
 }
 
 /* 密码验证 */
 .login-panel {
   max-width: 360px; margin: 60px auto; text-align:center;
-  background: rgba(20,60,80,.3); border:1px solid #2a4a5a;
-  border-radius:18px; padding: 30px 24px;
+  background: rgba(255,255,255,.06); border:2px solid #a55eea; border-radius:18px; padding: 30px 24px;
 }
-.login-panel h2 { font-size:20px; margin-bottom:20px; }
+.login-panel h2 { font-size:20px; margin-bottom:20px;
+  background: linear-gradient(90deg,#a55eea,#48dbfb);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
 input[type="password"], input[type="text"] {
-  width:100%; padding:12px 14px; border-radius:12px; border:1px solid #2a4a5a;
-  background: rgba(20,60,80,.3); color:#e6f0fa; font-size:14px; margin-bottom:12px; outline:none;
+  width:100%; padding:12px 14px; border-radius:12px; border:1px solid #444;
+  background: rgba(255,255,255,.08); color:#e6f0fa; font-size:14px; margin-bottom:12px; outline:none;
 }
-input:focus { border-color:#00d4ff; }
+input:focus { border-color:#a55eea; }
 .btn-primary {
   width:100%; padding:13px; border:none; border-radius:12px; cursor:pointer;
-  background: linear-gradient(135deg, #4f7cff, #00c6ff); color:#fff;
-  font-size:15px; font-weight:600; transition: all .2s;
+  background: linear-gradient(135deg, #a55eea, #48dbfb); color:#fff;
+  font-size:15px; font-weight:600; transition: all .3s;
 }
 .btn-primary:hover { filter:brightness(1.1); }
 .btn-small {
-  padding: 6px 12px; border:1px solid #2a4a5a; border-radius:8px; cursor:pointer;
-  background: rgba(79,124,255,.2); color:#e6f0fa; font-size:12px; margin:2px;
+  padding: 6px 12px; border:1px solid #444; border-radius:8px; cursor:pointer;
+  background: rgba(255,255,255,.1); color:#e6f0fa; font-size:12px; margin:2px;
 }
-.btn-small:hover { background: rgba(79,124,255,.35); }
+.btn-small:hover { background: rgba(255,255,255,.2); }
 .btn-small.danger { background: rgba(255,80,80,.2); color:#ff8a8a; }
 .msg { font-size:13px; margin-top:10px; padding:8px; border-radius:8px; display:none; }
 .msg.ok { display:block; background:rgba(80,200,120,.15); color:#7edba0; }
@@ -59,45 +60,57 @@ input:focus { border-color:#00d4ff; }
 .admin-panel.show { display:block; }
 .tabs { display:flex; gap:6px; margin-bottom:18px; flex-wrap:wrap; }
 .tab-btn {
-  padding: 8px 14px; border-radius:16px; border:1px solid #2a4a5a; cursor:pointer;
-  background: rgba(20,60,80,.3); color:#8ab4d4; font-size:13px; transition: all .2s;
+  padding: 8px 14px; border-radius:16px; border:1px solid #444; cursor:pointer;
+  background: rgba(255,255,255,.08); color:#c8a0f5; font-size:13px; transition: all .2s;
 }
-.tab-btn.active { background: linear-gradient(135deg, #4f7cff, #00c6ff); color:#fff; border:none; }
+.tab-btn.active { color:#fff; border:none; }
 .tab-panel { display:none; }
 .tab-panel.active { display:block; }
 
+/* 各标签页颜色主题 */
+.tab-btn.t-gold.active { background: linear-gradient(135deg,#feca57,#ff9f43); }
+.tab-btn.t-blue.active { background: linear-gradient(135deg,#48dbfb,#0abde3); }
+.tab-btn.t-cyan.active { background: linear-gradient(135deg,#1dd1a1,#10ac84); }
+.tab-btn.t-purple.active { background: linear-gradient(135deg,#a55eea,#5f27cd); }
+.tab-btn.t-pink.active { background: linear-gradient(135deg,#ff6b9d,#ee5a6f); }
+
 .panel-card {
-  background: rgba(20,60,80,.3); border:1px solid #2a4a5a;
-  border-radius:14px; padding:20px;
+  background: rgba(255,255,255,.06); border-radius:14px; padding:20px;
 }
+.panel-card.c-gold { border:1px solid #feca57; }
+.panel-card.c-blue { border:1px solid #48dbfb; }
+.panel-card.c-cyan { border:1px solid #1dd1a1; }
+.panel-card.c-purple { border:1px solid #a55eea; }
+.panel-card.c-pink { border:1px solid #ff6b9d; }
+
 textarea {
-  width:100%; padding:12px 14px; border-radius:12px; border:1px solid #2a4a5a;
-  background: rgba(20,60,80,.3); color:#e6f0fa; font-size:14px; margin-bottom:12px; outline:none;
+  width:100%; padding:12px 14px; border-radius:12px; border:1px solid #444;
+  background: rgba(255,255,255,.08); color:#e6f0fa; font-size:14px; margin-bottom:12px; outline:none;
   resize:vertical; min-height:80px; font-family:inherit;
 }
-textarea:focus { border-color:#00d4ff; }
+textarea:focus { border-color:#a55eea; }
 
 /* 列表项 */
 .list-item {
   display:flex; justify-content:space-between; align-items:center;
-  padding:12px 6px; border-bottom:1px solid rgba(42,74,90,.4);
+  padding:12px 6px; border-bottom:1px solid rgba(255,255,255,.08);
 }
 .list-item .info { flex:1; }
 .list-item .info .name { font-size:14px; }
 .list-item .info .sub { font-size:12px; color:#8ab4d4; }
 
-/* 柱形图 */
+/* 柱形图 - 粉色 */
 .chart-wrap { margin-top:10px; }
-.chart-title { text-align:center; font-size:15px; color:#8ab4d4; margin-bottom:20px; }
+.chart-title { text-align:center; font-size:15px; color:#ff6b9d; margin-bottom:20px; }
 .chart {
   display:flex; align-items:flex-end; justify-content:space-around;
-  height: 220px; padding: 0 10px; border-bottom:1px solid #2a4a5a;
+  height: 220px; padding: 0 10px; border-bottom:1px solid #ff6b9d;
 }
 .bar-col { display:flex; flex-direction:column; align-items:center; flex:1; }
-.bar-value { font-size:12px; color:#00d4ff; margin-bottom:6px; }
+.bar-value { font-size:12px; color:#ff6b9d; margin-bottom:6px; }
 .bar {
   width: 32px; max-width:60%; border-radius:6px 6px 0 0;
-  background: linear-gradient(180deg, #00c6ff, #4f7cff);
+  background: linear-gradient(180deg, #ff6b9d, #feca57);
   min-height: 4px; transition: height .5s ease;
 }
 .bar:hover { filter:brightness(1.2); }
@@ -123,55 +136,55 @@ textarea:focus { border-color:#00d4ff; }
   <!-- 管理面板 -->
   <div class="admin-panel" id="adminPanel">
     <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('tab-announce',this)">📢 发布公告</button>
-      <button class="tab-btn" onclick="switchTab('tab-register',this)">👤 注册用户</button>
-      <button class="tab-btn" onclick="switchTab('tab-users',this)">👥 用户列表</button>
-      <button class="tab-btn" onclick="switchTab('tab-requests',this)">🎵 歌曲请求</button>
-      <button class="tab-btn" onclick="switchTab('tab-stats',this)">📊 访问统计</button>
+      <button class="tab-btn t-gold active" onclick="switchTab('tab-announce',this)">📢 发布公告</button>
+      <button class="tab-btn t-blue" onclick="switchTab('tab-register',this)">👤 注册用户</button>
+      <button class="tab-btn t-cyan" onclick="switchTab('tab-users',this)">👥 用户列表</button>
+      <button class="tab-btn t-purple" onclick="switchTab('tab-requests',this)">🎵 歌曲请求</button>
+      <button class="tab-btn t-pink" onclick="switchTab('tab-stats',this)">📊 访问统计</button>
     </div>
 
-    <!-- 发布公告 -->
+    <!-- 发布公告 - 金色 -->
     <div class="tab-panel active" id="tab-announce">
-      <div class="panel-card">
-        <input type="text" id="annTitle" placeholder="公告标题">
+      <div class="panel-card c-gold">
+        <input type="text" id="annTitle" placeholder="公告标题" style="border-color:#feca57">
         <textarea id="annContent" placeholder="公告内容"></textarea>
-        <button class="btn-primary" onclick="publishAnnounce()">发布</button>
+        <button class="btn-primary" style="background:linear-gradient(135deg,#feca57,#ff9f43)" onclick="publishAnnounce()">发布</button>
         <div class="msg" id="annMsg"></div>
       </div>
     </div>
 
-    <!-- 注册用户 -->
+    <!-- 注册用户 - 蓝色 -->
     <div class="tab-panel" id="tab-register">
-      <div class="panel-card">
-        <input type="text" id="regUser" placeholder="用户名">
-        <input type="password" id="regPass" placeholder="密码">
-        <button class="btn-primary" onclick="registerUser()">注册</button>
+      <div class="panel-card c-blue">
+        <input type="text" id="regUser" placeholder="用户名" style="border-color:#48dbfb">
+        <input type="password" id="regPass" placeholder="密码" style="border-color:#48dbfb">
+        <button class="btn-primary" style="background:linear-gradient(135deg,#48dbfb,#0abde3)" onclick="registerUser()">注册</button>
         <div class="msg" id="regMsg"></div>
       </div>
     </div>
 
-    <!-- 用户列表 -->
+    <!-- 用户列表 - 青色 -->
     <div class="tab-panel" id="tab-users">
-      <div class="panel-card">
-        <button class="btn-primary" style="margin-bottom:12px" onclick="loadUsers()">加载用户列表</button>
+      <div class="panel-card c-cyan">
+        <button class="btn-primary" style="background:linear-gradient(135deg,#1dd1a1,#10ac84);margin-bottom:12px" onclick="loadUsers()">加载用户列表</button>
         <div id="userList"></div>
         <div class="msg" id="usersMsg"></div>
       </div>
     </div>
 
-    <!-- 歌曲请求 -->
+    <!-- 歌曲请求 - 紫色 -->
     <div class="tab-panel" id="tab-requests">
-      <div class="panel-card">
-        <button class="btn-primary" style="margin-bottom:12px" onclick="loadRequests()">加载歌曲请求</button>
+      <div class="panel-card c-purple">
+        <button class="btn-primary" style="background:linear-gradient(135deg,#a55eea,#5f27cd);margin-bottom:12px" onclick="loadRequests()">加载歌曲请求</button>
         <div id="reqList"></div>
         <div class="msg" id="reqMsg"></div>
       </div>
     </div>
 
-    <!-- 访问统计 -->
+    <!-- 访问统计 - 粉色 -->
     <div class="tab-panel" id="tab-stats">
-      <div class="panel-card">
-        <button class="btn-primary" style="margin-bottom:12px" onclick="loadStats()">加载访问统计</button>
+      <div class="panel-card c-pink">
+        <button class="btn-primary" style="background:linear-gradient(135deg,#ff6b9d,#ee5a6f);margin-bottom:12px" onclick="loadStats()">加载访问统计</button>
         <div class="chart-wrap" id="chartArea">
           <div class="chart-empty">点击「加载访问统计」查看最近 7 天数据</div>
         </div>
@@ -185,14 +198,10 @@ textarea:focus { border-color:#00d4ff; }
 const API = 'https://sb.lhb2009.cc.cd';
 const ADMIN_PASS = '20091030';
 
-let isAuthed = false;
-
-// 密码验证
 function verifyPass() {
   const p = document.getElementById('adminPass').value;
   const msg = document.getElementById('loginMsg');
   if (p === ADMIN_PASS) {
-    isAuthed = true;
     document.getElementById('loginPanel').style.display = 'none';
     document.getElementById('adminPanel').classList.add('show');
   } else {
@@ -393,7 +402,6 @@ function renderChart(list) {
 }
 
 function formatDate(dateStr) {
-  // 支持 2026-08-01 或 8/1 格式
   if (!dateStr) return '';
   const m = dateStr.match(/(\d{1,2})[/-](\d{1,2})$/);
   if (m) return `${parseInt(m[1])}/${parseInt(m[2])}`;
@@ -402,7 +410,6 @@ function formatDate(dateStr) {
   return dateStr;
 }
 
-// 回车登录
 document.getElementById('adminPass').addEventListener('keydown', e => {
   if (e.key === 'Enter') verifyPass();
 });

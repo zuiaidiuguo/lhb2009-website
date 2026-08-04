@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>收藏夹 - 工具箱</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(135deg, #0d0d1a 0%, #1a0d1a 40%, #2a0d1a 100%);
+  background-attachment: fixed; min-height: 100vh; color: #e6f0fa;
+}
+.container { max-width: 720px; margin: 0 auto; padding: 16px; }
+
+.header { display:flex; align-items:center; gap:14px; padding: 20px 4px 16px; }
+.back-btn {
+  width: 38px; height: 38px; border-radius: 50%; border:none; cursor:pointer;
+  background: rgba(255,255,255,.1); color:#e6f0fa; font-size:18px;
+  display:flex; align-items:center; justify-content:center;
+}
+.back-btn:hover { background: rgba(255,255,255,.2); }
+.header h1 {
+  font-size: 24px; font-weight:700;
+  background: linear-gradient(90deg, #ff6b9d, #feca57);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+
+/* 一键播放 */
+.play-all {
+  width:100%; padding:14px; border:none; border-radius:14px; cursor:pointer;
+  background: linear-gradient(135deg, #ff6b9d, #feca57); color:#fff;
+  font-size:16px; font-weight:600; margin-bottom:16px; transition: all .3s;
+}
+.play-all:hover { filter:brightness(1.1); }
+
+/* 收藏列表 */
+.fav-list { display:flex; flex-direction:column; gap:10px; }
+.fav-item {
+  display:flex; align-items:center; gap:12px;
+  background: rgba(255,255,255,.06); border:1px solid #ff6b9d; border-radius:12px;
+  padding: 14px 16px; transition: all .2s;
+}
+.fav-item:hover { background: rgba(255,255,255,.1); }
+.fav-item.dragging { opacity:.5; }
+.drag-handle {
+  cursor: grab; color:#feca57; font-size:20px; padding:6px; user-select:none;
+}
+.fav-item .name { flex:1; font-size:16px; }
+.fav-item .play-btn {
+  width:34px; height:34px; border-radius:50%; border:none; cursor:pointer;
+  background: linear-gradient(135deg,#ff6b9d,#feca57); color:#fff; font-size:14px;
+  display:flex; align-items:center; justify-content:center;
+}
+.fav-item .del-btn {
+  background:none; border:none; color:#ff5a5a; font-size:18px; cursor:pointer; padding:6px;
+}
+.fav-item .del-btn:hover { transform:scale(1.2); }
+
+/* 空状态 */
+.empty {
+  text-align:center; padding: 80px 20px; color:#ff6b9d;
+}
+.empty .icon { font-size:50px; margin-bottom:16px; }
+.empty .go-btn {
+  margin-top:16px; padding: 12px 24px; border-radius:20px; border:none; cursor:pointer;
+  background: linear-gradient(135deg, #ff6b9d, #feca57); color:#fff; font-size:14px;
+}
+
+/* 登录提示 */
+.login-hint {
+  text-align:center; padding: 60px 20px; color:#feca57;
+}
+.login-hint .go-btn {
+  margin-top:16px; padding: 12px 24px; border-radius:20px; border:none; cursor:pointer;
+  background: linear-gradient(135deg, #ff6b9d, #feca57); color:#fff; font-size:14px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <button class="back-btn" onclick="location.href='music.html'">←</button>
+    <h1>收藏夹</h1>
+  </div>
+
+  <div id="content"></div>
+</div>
+
+<script>
+const CDN = 'https://cdn.jsdelivr.net/gh/zuiaidiuguo/lhb2009-website@master';
+const AUDIO_BASE = CDN + '/music/';
+
+const songs = [
+  '爱错','爱情讯息','稻香','告白气球','红色高跟鞋','花海','鹿 be free','青花瓷',
+  '兰亭序','你从未离去','清空','晴天','我乘着风飞过来','心之火（DJ版）','最后一页','第57次取消发送',
+  'All For Love','All My People','Counting Stars','Edge Of My Life','Fever Pitch-Richz',
+  'Good Time','Monsters','Nevada','Power','Remember Our Summer','Sold Out','Teeth',
+  'That Girl','The King','This Is It','Unstoppable','Wake'
+];
+
+let currentUser = null;
+let favList = [];
+let audio = null;
+let currentFavIndex = -1;
+
+function init() {
+  const u = localStorage.getItem('lhb_user');
+  if (!u) {
+    document.getElementById('content').innerHTML = `
+      <div class="login-hint">
+        <div style="font-size:50px;margin-bottom:16px;">🔒</div>
+        <div>请先登录后查看收藏夹</div>
+        <button class="go-btn" onclick="location.href='index.html'">去登录</button>
+      </div>`;
+    return;
+  }
+  currentUser = JSON.parse(u);
+  loadFavorites();
+  render();
+}
+
+function getFavKey() {
+  return 'lhb_fav_' + (currentUser ? currentUser.username : 'guest');
+}
+
+function loadFavorites() {
+  favList = JSON.parse(localStorage.getItem(getFavKey()) || '[]');
+}
+
+function saveFavorites() {
+  localStorage.setItem(getFavKey(), JSON.stringify(favList));
+}
+
+function render() {
+  const content = document.getElementById('content');
+  if (favList.length === 0) {
+    content.innerHTML = `
+      <div class="empty">
+        <div class="icon">💔</div>
+        <div>暂无收藏歌曲</div>
+        <button class="go-btn" onclick="location.href='music.html'">去收藏</button>
+      </div>`;
+    return;
+  }
+  let html = '<button class="play-all" onclick="playAll()">▶ 一键播放全部</button><div class="fav-list">';
+  favList.forEach((song, i) => {
+    html += `
+      <div class="fav-item" draggable="true" data-index="${i}">
+        <span class="drag-handle">≡</span>
+        <div class="name">${song}</div>
+        <button class="play-btn" onclick="playOne(${i})">▶</button>
+        <button class="del-btn" onclick="removeFav(${i})">✕</button>
+      </div>`;
+  });
+  html += '</div>';
+  content.innerHTML = html;
+  setupDrag();
+}
+
+// 一键播放全部
+function playAll() {
+  if (favList.length === 0) return;
+  currentFavIndex = 0;
+  playFavAt(0);
+}
+
+function playOne(i) {
+  currentFavIndex = i;
+  playFavAt(i);
+}
+
+function playFavAt(i) {
+  if (!audio) audio = new Audio();
+  const song = favList[i];
+  audio.src = AUDIO_BASE + encodeURIComponent(song) + '.mp3';
+  audio.play();
+  audio.onended = () => {
+    if (currentFavIndex < favList.length - 1) {
+      currentFavIndex++;
+      playFavAt(currentFavIndex);
+    }
+  };
+}
+
+function removeFav(i) {
+  favList.splice(i, 1);
+  saveFavorites();
+  render();
+}
+
+// 拖拽排序
+function setupDrag() {
+  const items = document.querySelectorAll('.fav-item');
+  let draggedItem = null;
+  items.forEach(item => {
+    item.addEventListener('dragstart', e => {
+      draggedItem = item;
+      item.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    item.addEventListener('dragend', () => {
+      item.classList.remove('dragging');
+      draggedItem = null;
+    });
+    item.addEventListener('dragover', e => {
+      e.preventDefault();
+    });
+    item.addEventListener('drop', e => {
+      e.preventDefault();
+      if (!draggedItem || draggedItem === item) return;
+      const from = parseInt(draggedItem.dataset.index);
+      const to = parseInt(item.dataset.index);
+      const [moved] = favList.splice(from, 1);
+      favList.splice(to, 0, moved);
+      saveFavorites();
+      render();
+    });
+  });
+}
+
+init();
+</script>
+</body>
+</html>

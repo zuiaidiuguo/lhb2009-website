@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>下载 - 工具箱</title>
+<title>网盘工具 - 工具箱</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  background: linear-gradient(180deg, #0d1a2d 0%, #132b3a 50%, #1a2a3a 100%);
+  background: linear-gradient(135deg, #0d0d1a 0%, #0d1a2d 50%, #132b3a 100%);
   background-attachment: fixed; min-height: 100vh; color: #e6f0fa;
 }
 .container { max-width: 720px; margin: 0 auto; padding: 16px; }
@@ -16,29 +16,31 @@ body {
 .header { display:flex; align-items:center; gap:14px; padding: 20px 4px 16px; }
 .back-btn {
   width: 38px; height: 38px; border-radius: 50%; border:none; cursor:pointer;
-  background: rgba(20,60,80,.4); color:#e6f0fa; font-size:18px;
-  display:flex; align-items:center; justify-content:center; border:1px solid #2a4a5a;
+  background: rgba(255,255,255,.1); color:#e6f0fa; font-size:18px;
+  display:flex; align-items:center; justify-content:center;
 }
-.back-btn:hover { background: rgba(20,60,80,.6); }
+.back-btn:hover { background: rgba(255,255,255,.2); }
 .header h1 {
   font-size: 24px; font-weight:700;
-  background: linear-gradient(90deg, #4f7cff, #00c6ff);
+  background: linear-gradient(90deg, #48dbfb, #1dd1a1);
   -webkit-background-clip:text; -webkit-text-fill-color:transparent;
 }
 
-/* 工具列表 */
+/* 工具列表 - 蓝色/青色混合 */
 .tool-list { display:flex; flex-direction:column; gap:12px; padding-top:8px; }
 .tool-item {
   display:flex; align-items:center; gap:16px;
-  background: rgba(20,60,80,.3); border:1px solid #2a4a5a;
-  border-radius:14px; padding: 18px 20px; cursor:pointer; transition: all .25s;
+  background: rgba(255,255,255,.06); border-radius:14px; padding: 18px 20px; cursor:pointer;
+  transition: all .25s; border-left: 4px solid;
 }
-.tool-item:hover { background: rgba(20,60,80,.5); border-color:#00d4ff; transform: translateY(-2px); }
+.tool-item:nth-child(odd) { border-left-color: #48dbfb; }
+.tool-item:nth-child(even) { border-left-color: #1dd1a1; }
+.tool-item:hover { background: rgba(255,255,255,.1); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(72,219,251,.15); }
 .tool-item .icon { font-size: 28px; }
 .tool-item .name { flex:1; font-size:16px; font-weight:500; }
-.tool-item .dl { color:#00d4ff; font-size:14px; }
+.tool-item .dl { color:#48dbfb; font-size:14px; }
 
-/* 验证码模态框 */
+/* 验证码模态框 - 蓝色/青色 */
 .modal {
   display:none; position:fixed; inset:0; z-index:100;
   background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
@@ -46,31 +48,32 @@ body {
 }
 .modal.show { display:flex; }
 .modal-box {
-  background:#132b3a; border:1px solid #2a4a5a;
-  border-radius:18px; width:100%; max-width:340px; padding:24px; text-align:center;
-  position:relative;
+  background:#0d1a2d; border:1px solid #48dbfb; border-radius:18px;
+  width:100%; max-width:340px; padding:24px; text-align:center; position:relative;
 }
 .modal-close {
   position:absolute; top:10px; right:14px; background:none; border:none;
-  color:#8ab4d4; font-size:22px; cursor:pointer; line-height:1;
+  color:rgba(255,255,255,.5); font-size:22px; cursor:pointer; line-height:1;
 }
-.modal-close:hover { color:#00d4ff; }
-.modal-box h3 { font-size:18px; margin-bottom:6px; }
+.modal-close:hover { color:#48dbfb; }
+.modal-box h3 { font-size:18px; margin-bottom:6px;
+  background: linear-gradient(90deg,#48dbfb,#1dd1a1);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
 .modal-box .hint { font-size:13px; color:#8ab4d4; margin-bottom:16px; }
 .captcha-box {
   font-size:28px; font-weight:700; letter-spacing:8px; padding:14px;
-  background: rgba(20,60,80,.3); border:1px solid #2a4a5a; border-radius:12px;
-  margin-bottom:14px; user-select:none; cursor:pointer; color:#00d4ff;
+  background: rgba(255,255,255,.08); border:1px solid #48dbfb; border-radius:12px;
+  margin-bottom:14px; user-select:none; cursor:pointer; color:#48dbfb;
 }
 .captcha-input {
-  width:100%; padding:12px 14px; border-radius:12px; border:1px solid #2a4a5a;
-  background: rgba(20,60,80,.3); color:#e6f0fa; font-size:20px; text-align:center;
+  width:100%; padding:12px 14px; border-radius:12px; border:1px solid #444;
+  background: rgba(255,255,255,.08); color:#e6f0fa; font-size:20px; text-align:center;
   letter-spacing:6px; outline:none; margin-bottom:14px;
 }
-.captcha-input:focus { border-color:#00d4ff; }
+.captcha-input:focus { border-color:#48dbfb; }
 .btn-primary {
   width:100%; padding:13px; border:none; border-radius:12px; cursor:pointer;
-  background: linear-gradient(135deg, #4f7cff, #00c6ff); color:#fff; font-size:15px; font-weight:600;
+  background: linear-gradient(135deg, #48dbfb, #1dd1a1); color:#fff; font-size:15px; font-weight:600;
 }
 .btn-primary:hover { filter:brightness(1.1); }
 .captcha-refresh { font-size:12px; color:#8ab4d4; margin-top:10px; cursor:pointer; }
@@ -83,9 +86,8 @@ body {
 <div class="container">
   <div class="header">
     <button class="back-btn" onclick="location.href='index.html'">←</button>
-    <h1>下载</h1>
+    <h1>网盘工具</h1>
   </div>
-
   <div class="tool-list" id="toolList"></div>
 </div>
 
@@ -104,9 +106,6 @@ body {
 </div>
 
 <script>
-const API = 'https://sb.lhb2009.cc.cd';
-
-// 工具包列表（真实 CDN 地址）
 const CDN = 'https://cdn.jsdelivr.net/gh/zuiaidiuguo/lhb2009-website@master';
 const tools = [
   { name:'截屏.zip', icon:'📸', url: CDN + '/files/截屏.zip' },
@@ -145,14 +144,12 @@ function genCaptcha() {
   for (let i=0; i<4; i++) captchaCode += Math.floor(Math.random()*10);
   document.getElementById('captchaBox').textContent = captchaCode;
 }
-
 function refreshCaptcha() {
   genCaptcha();
   document.getElementById('captchaInput').value = '';
   document.getElementById('captchaMsg').className = 'msg';
   document.getElementById('captchaMsg').textContent = '';
 }
-
 function openCaptcha(tool) {
   currentTool = tool;
   document.getElementById('dlTitle').textContent = '下载：' + tool.name;
@@ -163,11 +160,7 @@ function openCaptcha(tool) {
   document.getElementById('captchaModal').classList.add('show');
   setTimeout(()=>document.getElementById('captchaInput').focus(), 100);
 }
-
-function closeCaptcha() {
-  document.getElementById('captchaModal').classList.remove('show');
-}
-
+function closeCaptcha() { document.getElementById('captchaModal').classList.remove('show'); }
 function verifyCaptcha() {
   const input = document.getElementById('captchaInput').value;
   const msg = document.getElementById('captchaMsg');
@@ -190,10 +183,7 @@ function verifyCaptcha() {
   }
 }
 
-// ESC 关闭
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeCaptcha();
-});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCaptcha(); });
 document.getElementById('captchaModal').addEventListener('click', e => {
   if (e.target === document.getElementById('captchaModal')) closeCaptcha();
 });
