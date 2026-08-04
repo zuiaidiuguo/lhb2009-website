@@ -234,7 +234,7 @@ async function doLogin(){
   try{
     const r=await fetch(API+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
     const data=await r.json();
-    if(data&&data.ok){ localStorage.setItem('lhb_user',u); err.textContent=''; document.getElementById('loginModal').classList.remove('show'); init(); }
+    if(data&&data.code===0){ localStorage.setItem('lhb_user',u); err.textContent=''; document.getElementById('loginModal').classList.remove('show'); init(); }
     else err.textContent=(data&&data.msg)||'用户名或密码错误';
   }catch(e){ err.textContent='网络错误，请重试'; }
 }
@@ -245,7 +245,7 @@ async function doReg(){
   try{
     const r=await fetch(API+'/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
     const data=await r.json();
-    if(data&&data.ok){ localStorage.setItem('lhb_user',u); err.textContent=''; document.getElementById('regModal').classList.remove('show'); init(); }
+    if(data&&data.code===0){ localStorage.setItem('lhb_user',u); err.textContent=''; document.getElementById('regModal').classList.remove('show'); init(); }
     else err.textContent=(data&&data.msg)||'注册失败';
   }catch(e){ err.textContent='网络错误，请重试'; }
 }

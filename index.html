@@ -154,7 +154,7 @@ async function loadAnnouncements(){
   try{
     const r=await fetch(API+'/announcement');
     const data=await r.json();
-    const list=(data&&data.list)||[];
+    const list=(data&&data.data)||[];
     const marquee=document.getElementById('marquee');
     if(list.length){
       marquee.textContent='📢 '+list.map(a=>a.content).join('　　·　　');
@@ -197,7 +197,7 @@ async function doLogin(){
   try{
     const r=await fetch(API+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
     const data=await r.json();
-    if(data&&data.ok){
+    if(data&&data.code===0){
       localStorage.setItem('lhb_user',u);
       err.textContent='';
       document.getElementById('loginModal').classList.remove('show');
@@ -218,7 +218,7 @@ async function doReg(){
   try{
     const r=await fetch(API+'/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
     const data=await r.json();
-    if(data&&data.ok){
+    if(data&&data.code===0){
       localStorage.setItem('lhb_user',u);
       err.textContent='';
       document.getElementById('regModal').classList.remove('show');

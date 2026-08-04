@@ -393,7 +393,7 @@ async function doLogin(){
   try{
     const r=await fetch(API+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
     const data=await r.json();
-    if(data&&data.ok){ localStorage.setItem('lhb_user',u); err.textContent=''; document.getElementById('loginModal').classList.remove('show'); loadFavs(); renderList(document.getElementById('search').value); }
+    if(data&&data.code===0){ localStorage.setItem('lhb_user',u); err.textContent=''; document.getElementById('loginModal').classList.remove('show'); loadFavs(); renderList(document.getElementById('search').value); }
     else err.textContent=(data&&data.msg)||'用户名或密码错误';
   }catch(e){ err.textContent='网络错误，请重试'; }
 }
@@ -404,7 +404,7 @@ async function doReg(){
   try{
     const r=await fetch(API+'/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
     const data=await r.json();
-    if(data&&data.ok){ localStorage.setItem('lhb_user',u); err.textContent=''; document.getElementById('regModal').classList.remove('show'); loadFavs(); renderList(document.getElementById('search').value); }
+    if(data&&data.code===0){ localStorage.setItem('lhb_user',u); err.textContent=''; document.getElementById('regModal').classList.remove('show'); loadFavs(); renderList(document.getElementById('search').value); }
     else err.textContent=(data&&data.msg)||'注册失败';
   }catch(e){ err.textContent='网络错误，请重试'; }
 }
@@ -431,7 +431,7 @@ async function submitReq(){
   try{
     const r=await fetch(API+'/request-song',{method:'POST',headers,body:JSON.stringify({song:name,note})});
     const data=await r.json();
-    if(data&&data.ok){ localStorage.setItem(LAST_REQ_KEY+u,Date.now()); document.getElementById('reqModal').classList.remove('show'); document.getElementById('reqName').value=''; document.getElementById('reqNote').value=''; alert('求歌提交成功！'); }
+    if(data&&data.code===0){ localStorage.setItem(LAST_REQ_KEY+u,Date.now()); document.getElementById('reqModal').classList.remove('show'); document.getElementById('reqName').value=''; document.getElementById('reqNote').value=''; alert('求歌提交成功！'); }
     else err.textContent=(data&&data.msg)||'提交失败';
   }catch(e){ err.textContent='网络错误，请重试'; }
 }

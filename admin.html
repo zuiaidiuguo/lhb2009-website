@@ -172,7 +172,7 @@ async function publishAnn(){
   try{
     const r=await fetch(API+'/announcement',{method:'POST',headers:authHeaders(true),body:JSON.stringify({title,content})});
     const data=await r.json();
-    if(data&&data.ok){ msg.textContent='✓ 公告发布成功'; document.getElementById('annTitle').value=''; document.getElementById('annContent').value=''; }
+    if(data&&data.code===0){ msg.textContent='✓ 公告发布成功'; document.getElementById('annTitle').value=''; document.getElementById('annContent').value=''; }
     else msg.textContent='发布失败';
   }catch(e){ msg.textContent='网络错误'; }
 }
@@ -185,7 +185,7 @@ async function adminReg(){
   try{
     const r=await fetch(API+'/register',{method:'POST',headers:authHeaders(true),body:JSON.stringify({username:u,password:p})});
     const data=await r.json();
-    if(data&&data.ok){ msg.textContent='✓ 注册成功'; document.getElementById('regUser').value=''; document.getElementById('regPass').value=''; loadUsers(); }
+    if(data&&data.code===0){ msg.textContent='✓ 注册成功'; document.getElementById('regUser').value=''; document.getElementById('regPass').value=''; loadUsers(); }
     else msg.textContent=(data&&data.msg)||'注册失败';
   }catch(e){ msg.textContent='网络错误'; }
 }
@@ -196,34 +196,35 @@ async function loadUsers(){
   try{
     const r=await fetch(API+'/users',{headers:authHeaders()});
     const data=await r.json();
-    const users=(data&&data.list)||(data&&data.users)||[];
+    const users=(data&&data.data)||[];
     if(!users.length){ el.innerHTML='<div class="list-item">暂无用户</div>'; return; }
     el.innerHTML=users.map((u,i)=>{
       const name=u.username||u.name||'未知';
+      const uid=u.id;
       return `<div class="list-item">
-        <span class="nm">${name}<div class="sub">注册于 ${u.createdAt||'未知'}</div></span>
-        <span class="edit" onclick="editUser('${name}')">编辑</span>
-        <span class="del" onclick="delUser('${name}')">删除</span>
+        <span class="nm">${name}<div class="sub">注册于 ${u.created||'未知'}</div></span>
+        <span class="edit" onclick="editUser(${uid},'${name}')">编辑</span>
+        <span class="del" onclick="delUser(${uid},'${name}')">删除</span>
       </div>`;
     }).join('');
   }catch(e){ el.innerHTML='<div class="list-item">加载失败</div>'; }
 }
-async function editUser(name){
+async function editUser(id,name){
   const newPass=prompt('输入新的密码（留空取消）');
   if(newPass===null) return;
   if(!newPass){ alert('密码不能为空'); return; }
   try{
-    const r=await fetch(API+'/user?username='+encodeURIComponent(name),{method:'PUT',headers:authHeaders(true),body:JSON.stringify({password:newPass})});
+    const r=await fetch(API+'/user',{method:'PUT',headers:authHeaders(true),body:JSON.stringify({id,username:name,password:newPass})});
     const data=await r.json();
-    if(data&&data.ok){ alert('修改成功'); loadUsers(); } else alert('修改失败');
+    if(data&&data.code===0){ alert('修改成功'); loadUsers(); } else alert('修改失败');
   }catch(e){ alert('网络错误'); }
 }
-async function delUser(name){
+async function delUser(id,name){
   if(!confirm('确定删除用户 '+name+' 吗？')) return;
   try{
-    const r=await fetch(API+'/user?username='+encodeURIComponent(name),{method:'DELETE',headers:authHeaders()});
+    const r=await fetch(API+'/user',{method:'DELETE',headers:authHeaders(true),body:JSON.stringify({id})});
     const data=await r.json();
-    if(data&&data.ok) loadUsers(); else alert('删除失败');
+    if(data&&data.code===0) loadUsers(); else alert('删除失败');
   }catch(e){ alert('网络错误'); }
 }
 
@@ -233,20 +234,20 @@ async function loadRequests(){
   try{
     const r=await fetch(API+'/requests',{headers:authHeaders()});
     const data=await r.json();
-    const reqs=(data&&data.list)||[];
+    const reqs=(data&&data.data)||[];
     if(!reqs.length){ el.innerHTML='<div class="list-item">暂无歌曲请求</div>'; return; }
     el.innerHTML=reqs.map(q=>`
       <div class="list-item">
-        <span class="nm">🎵 ${q.song||q.name||'未知'}<div class="sub">${q.note||''} · ${q.userId||'匿名'}</div></span>
-        <span class="del" onclick="delReq('${q.id}')">删除</span>
+        <span class="nm">🎵 ${q.song||q.name||'未知'}<div class="sub">${q.time||''} · ${q.user||'匿名'}</div></span>
+        <span class="del" onclick="delReq(${q.id})">删除</span>
       </div>`).join('');
   }catch(e){ el.innerHTML='<div class="list-item">加载失败</div>'; }
 }
 async function delReq(id){
   try{
-    const r=await fetch(API+'/request?id='+encodeURIComponent(id),{method:'DELETE',headers:authHeaders()});
+    const r=await fetch(API+'/request',{method:'DELETE',headers:authHeaders(true),body:JSON.stringify({id})});
     const data=await r.json();
-    if(data&&data.ok) loadRequests(); else alert('操作失败');
+    if(data&&data.code===0) loadRequests(); else alert('操作失败');
   }catch(e){ alert('网络错误'); }
 }
 
@@ -255,7 +256,7 @@ async function loadStats(){
   try{
     const r=await fetch(API+'/stats/visits',{headers:authHeaders()});
     const data=await r.json();
-    renderChart((data&&data.list)||[]);
+    renderChart((data&&data.data)||[]);
   }catch(e){ renderChart([]); }
 }
 function renderChart(days){
