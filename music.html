@@ -148,7 +148,7 @@ const API='https://sb.lhb2009.cc.cd';
 const CDN='https://cdn.jsdmirror.cn/gh/zuiaidiuguo/lhb2009-website@master/';
 const USER_KEY='lhb_user';
 const REQ_KEY='lhb_req_time_';
-const SONGS=['爱错','爱情讯息','稻香','告白气球','红色高跟鞋','花海','鹿 be free','你从未离去','清空','晴天','我乘着风飞过来','最后一页','第五十七次取消发送','All For Love','All My People','Counting Stars','Edge Of My Life','Fever Pitch-Richz','Good Time','Monsters','Nevada','Power','Remember Our Summer','Sold Out','Teeth','That Girl','The King','This Is It','Unstoppable','Wake'];
+const SONGS=['爱错','爱情讯息','稻香','告白气球','红色高跟鞋','花海','鹿 be free','你从未离去','清空','晴天','我乘着风飞过来','最后一页','第五十七次取消发送','All For Love','All My People','Counting Stars','Edge Of My Life','Fever Pitch','Good Time','Monsters','Nevada','Power','Remember Our Summer','Sold Out','Teeth','That Girl','The King','This Is It','Unstoppable','Wake'];
 
 const $=id=>document.getElementById(id);
 let toastTimer=null;
@@ -198,15 +198,14 @@ $('progress').addEventListener('click',function(e){if(!audio.duration)return;con
 let curLrc=null;
 function loadLrc(){
   curLrc=null;
-  const isEng=isEnglishSong(SONGS[cur]);
   fetch(lrcUrl(SONGS[cur])).then(r=>{if(!r.ok)throw 0;return r.text();}).then(txt=>{
     const lines=txt.split(/\r?\n/);const arr=[];let prev=null;
-    for(const ln of lines){const m=ln.match(/\[(\d{1,2}):(\d{2}(?:\.\d+)?)\](.*)/);if(m){const time=+m[1]*60+parseFloat(m[2]);const text=m[3].trim();if(text){if(prev&&Math.abs(prev.t-time)<0.001){if(!isEng)prev.t2=text;}else{prev={t:time,txt:text};arr.push(prev);}}}}
+    for(const ln of lines){const m=ln.match(/\[(\d{1,2}):(\d{2}(?:\.\d+)?)\](.*)/);if(m){const time=+m[1]*60+parseFloat(m[2]);const text=m[3].trim();if(text){if(prev&&Math.abs(prev.t-time)<0.001){prev.t2=text;}else{prev={t:time,txt:text};arr.push(prev);}}}}
     if(arr.length){curLrc=arr;renderLrc();}else noLrc();
   }).catch(()=>noLrc());
 }
 function renderLrc(){const box=$('lyrics');box.innerHTML='';curLrc.forEach((l,i)=>{const d=document.createElement('div');d.className='ly';d.id='ly'+i;if(l.t2){d.innerHTML='<span class="l-orig">'+l.txt+'</span><br><span class="l-tr">'+l.t2+'</span>';}else{d.textContent=l.txt;}box.appendChild(d);});}
-function noLrc(){const u=getUser();$('lyrics').innerHTML='<div class="no-lrc">暂无歌词'+(u?'<br><button class="req" onclick="openRequest()">求这首歌</button>':'')+'</div>';}
+function noLrc(){$('lyrics').innerHTML='<div class="no-lrc">暂无歌词</div>';}
 function syncLrc(t){if(!curLrc||!curLrc.length)return;let act=-1;for(let i=0;i<curLrc.length;i++){if(t>=curLrc[i].t)act=i;else break;}const box=$('lyrics');const list=box.querySelectorAll('.ly');list.forEach((el,i)=>el.classList.toggle('active',i===act));if(act>=0&&list[act])list[act].scrollIntoView({block:'center',behavior:'smooth'});}
 audio.addEventListener('timeupdate',()=>syncLrc(audio.currentTime));
 
@@ -220,10 +219,10 @@ function openLogin(){$('loginModal').classList.add('show');$('loginErr').textCon
 function closeAllModal(){document.querySelectorAll('.modal-mask').forEach(m=>m.classList.remove('show'));}
 document.querySelectorAll('.close-x').forEach(b=>{b.onclick=()=>closeAllModal();});
 document.querySelectorAll('.modal-mask').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)closeAllModal();});});
-async function doLogin(){const u=$('loginUser').value.trim(),p=$('loginPass').value;const err=$('loginErr');if(!u||!p){err.textContent='请输入用户名和密码';return;}try{const r=await fetch(API+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});const j=await r.json();if(j.success){localStorage.setItem(USER_KEY,u);closeAllModal();toast('登录成功');renderList();}else err.textContent=j.message||'登录失败';}catch(e){err.textContent='网络错误，请稍后重试';}}
+async function doLogin(){const u=$('loginUser').value.trim(),p=$('loginPass').value;const err=$('loginErr');if(!u||!p){err.textContent='请输入用户名和密码';return;}try{const r=await fetch(API+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});const j=await r.json();if(j.success||j.code===0){localStorage.setItem(USER_KEY,u);if(j.user&&j.user.id)localStorage.setItem('lhb_user_id',j.user.id);closeAllModal();toast('登录成功');renderList();}else err.textContent=j.message||j.msg||'登录失败';}catch(e){err.textContent='网络错误，请稍后重试';}}
 
 function openRequest(){const u=getUser();if(!u){toast('请先登录');openLogin();return;}const last=+localStorage.getItem(REQ_KEY+u)||0;if(Date.now()-last<180000){toast('求歌太频繁，请3分钟后再试');return;}$('reqModal').classList.add('show');$('reqErr').textContent='';$('reqName').value=cur>=0?SONGS[cur]:'';$('reqNote').value='';}
-async function submitReq(){const u=getUser(),name=$('reqName').value.trim(),note=$('reqNote').value.trim();const err=$('reqErr');if(!name){err.textContent='请输入歌曲名';return;}try{const r=await fetch(API+'/request-song',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,song:name,note})});const j=await r.json();if(j.success){localStorage.setItem(REQ_KEY+u,Date.now());closeAllModal();toast('已提交请求');}else err.textContent=j.message||'提交失败';}catch(e){err.textContent='网络错误，请稍后重试';}}
+async function submitReq(){const u=getUser(),name=$('reqName').value.trim(),note=$('reqNote').value.trim();const err=$('reqErr');if(!name){err.textContent='请输入歌曲名';return;}const headers={'Content-Type':'application/json'};if(u)headers['X-User-Id']=localStorage.getItem('lhb_user_id')||u;try{const r=await fetch(API+'/request-song',{method:'POST',headers,body:JSON.stringify({username:u,song:name,note})});const j=await r.json();if(j.success||j.code===0){localStorage.setItem(REQ_KEY+u,Date.now());closeAllModal();toast('已提交请求');}else err.textContent=j.message||j.msg||'提交失败';}catch(e){err.textContent='网络错误，请稍后重试';}}
 
 document.querySelectorAll('#speedBar .chip').forEach(c=>{c.onclick=()=>{document.querySelectorAll('#speedBar .chip').forEach(x=>x.classList.remove('active'));c.classList.add('active');audio.playbackRate=parseFloat(c.dataset.s);};});
 

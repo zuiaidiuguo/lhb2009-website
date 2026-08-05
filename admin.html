@@ -327,7 +327,7 @@ async function publishAnn(){
   }catch(e){ msg.textContent='网络错误'; }
 }
 
-// 公告历史（倒序，最新在上，带删除按钮）
+// 公告历史（按时间倒序，最新在上，带删除按钮）
 let delAnnId=null;
 async function loadAnnHist(){
   const el=document.getElementById('annHist');
@@ -336,15 +336,19 @@ async function loadAnnHist(){
     const data=await r.json();
     const list=(data&&data.data)||[];
     if(!list.length){ el.innerHTML='<div class="hist-item">暂无公告</div>'; return; }
-    // 最新的在上（倒序）
-    const rev=[...list].reverse();
-    el.innerHTML=rev.map(a=>`
+    // 按时间倒序排列（最新在上）
+    const sorted=[...list].sort((a,b)=>{
+      const ta=a.time||a.created||a.timestamp||0;
+      const tb=b.time||b.created||b.timestamp||0;
+      return new Date(tb)-new Date(ta);
+    });
+    el.innerHTML=sorted.map(a=>`
       <div class="hist-item">
         <div>
           <div class="content">${a.content||a.title||'无内容'}</div>
           <div class="time">🕐 ${a.time||a.created||''}</div>
         </div>
-        <span class="del" onclick="openDelAnn(${a.id})">删除</span>
+        <span class="del" onclick="openDelAnn('${a.id}')">删除</span>
       </div>`).join('');
   }catch(e){ el.innerHTML='<div class="hist-item">加载失败</div>'; }
 }
@@ -356,11 +360,12 @@ function openDelAnn(id){
 document.getElementById('closeDelAnn').onclick=()=>hideModal(document.getElementById('delAnnModal'));
 document.getElementById('delAnnModal').addEventListener('click',e=>{ if(e.target.id==='delAnnModal')hideModal(e.target); });
 async function confirmDelAnn(){
+  if(delAnnId==null){ toast('删除失败：缺少公告ID'); return; }
   try{
-    const r=await fetch(API+'/announcement',{method:'DELETE',headers:authHeaders(true),body:JSON.stringify({id:delAnnId})});
-    const data=await r.json();
-    if(data&&data.code===0){ hideModal(document.getElementById('delAnnModal')); toast('已删除公告'); loadAnnHist(); }
-    else toast('删除失败');
+    const r=await fetch(API+'/announcement/'+delAnnId,{method:'DELETE',headers:authHeaders(true)});
+    const data=await r.json().catch(()=>({}));
+    if(data.code===0||data.success===true||r.ok){ hideModal(document.getElementById('delAnnModal')); toast('已删除公告'); loadAnnHist(); }
+    else toast((data.msg)||'删除失败');
   }catch(e){ toast('网络错误'); }
 }
 // 清空所有公告
@@ -369,10 +374,10 @@ document.getElementById('closeClearAnn').onclick=()=>hideModal(document.getEleme
 document.getElementById('clearAnnModal').addEventListener('click',e=>{ if(e.target.id==='clearAnnModal')hideModal(e.target); });
 async function confirmClearAnn(){
   try{
-    const r=await fetch(API+'/announcements',{method:'DELETE',headers:authHeaders(true)});
-    const data=await r.json();
-    if(data&&data.code===0){ hideModal(document.getElementById('clearAnnModal')); toast('已清空所有公告'); loadAnnHist(); }
-    else toast('清空失败');
+    const r=await fetch(API+'/announcement',{method:'DELETE',headers:authHeaders(true)});
+    const data=await r.json().catch(()=>({}));
+    if(data.code===0||data.success===true||r.ok){ hideModal(document.getElementById('clearAnnModal')); toast('已清空所有公告'); loadAnnHist(); }
+    else toast((data.msg)||'清空失败');
   }catch(e){ toast('网络错误'); }
 }
 
