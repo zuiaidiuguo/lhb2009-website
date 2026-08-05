@@ -32,18 +32,15 @@ body{
 .title{font-size:24px;font-weight:800;flex:1;
   background:linear-gradient(90deg,var(--pink),var(--purple));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.topright{display:flex;align-items:center;gap:10px;}
 .username{color:var(--purple);font-size:14px;font-weight:700;}
 
-/* 排序工具栏 */
-.sortbar{display:flex;gap:10px;margin-bottom:16px;}
+/* 工具栏：字母排序 + 一键播放（放在时间排序位置，非横条） */
+.toolbar{display:flex;gap:10px;margin-bottom:16px;}
 .sortbtn{flex:1;padding:11px;border-radius:14px;font-size:14px;font-weight:600;cursor:pointer;
   border:1px solid var(--border);background:var(--card);color:var(--text2);box-shadow:var(--shadow);transition:all .25s;}
 .sortbtn.active{background:linear-gradient(90deg,var(--pink),var(--purple));color:#fff;border-color:transparent;}
-
-/* 一键播放 */
-.playall{width:100%;padding:14px;border:none;border-radius:16px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:18px;color:#fff;
-  background:linear-gradient(90deg,var(--pink),var(--purple));box-shadow:0 6px 18px rgba(244,114,182,.35);
+.playall{flex:1;padding:11px;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;color:#fff;
+  background:linear-gradient(90deg,var(--primary),var(--purple));box-shadow:0 4px 14px rgba(79,124,255,.3);
   transition:transform .15s ease;}
 .playall:active{transform:scale(.96);}
 .playall:disabled{opacity:.5;cursor:not-allowed;}
@@ -73,6 +70,8 @@ body{
 .modal-box{width:90%;max-width:340px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:26px 22px;position:relative;
   box-shadow:0 20px 50px rgba(79,124,255,.25);animation:modalIn .25s ease;}
 @keyframes modalIn{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:scale(1);}}
+.modal-out{animation:modalOut .2s ease forwards;}
+@keyframes modalOut{from{opacity:1;transform:scale(1);}to{opacity:0;transform:scale(.92);}}
 .modal-box h3{text-align:center;margin-bottom:18px;font-size:20px;color:var(--text);}
 .close-x{position:absolute;top:10px;right:14px;font-size:22px;color:var(--text2);cursor:pointer;background:none;border:none;}
 .close-x:hover{color:var(--purple);}
@@ -104,17 +103,13 @@ body{
   <div class="topbar">
     <a class="back" href="music.html">‹</a>
     <span class="title">♡ 收藏夹</span>
-    <div class="topright">
-      <span class="username" id="username"></span>
-    </div>
+    <span class="username" id="username"></span>
   </div>
 
-  <div class="sortbar">
+  <div class="toolbar">
     <button class="sortbtn" id="sortAlpha" onclick="toggleAlpha()">字母排序</button>
-    <button class="sortbtn" id="sortTime" onclick="toggleTime()">时间排序</button>
+    <button class="playall" id="playAll" onclick="playAll()">▶ 一键播放</button>
   </div>
-
-  <button class="playall" id="playAll" onclick="playAll()">▶ 一键播放全部</button>
 
   <div class="favlist" id="favlist"></div>
   <div class="empty" id="empty" style="display:none;">
@@ -156,8 +151,7 @@ body{
 const API='https://sb.lhb2009.cc.cd';
 const FAV_KEY='lhb_fav_';
 let favs=[]; // 每项 {name, time}
-let sortAlpha='az'; // az / za
-let sortTime='asc'; // asc / desc
+let sortAlpha='az'; // az / za（默认按添加时间，新在上；字母排序为可选）
 let dragIndex=null;
 
 function getFavKey(){ const u=localStorage.getItem('lhb_user'); return FAV_KEY+(u||'guest'); }
@@ -170,25 +164,26 @@ function loadFavs(){
 function saveFavs(){ localStorage.setItem(getFavKey(),JSON.stringify(favs)); }
 
 // 排序状态持久化
-function loadSort(){ sortAlpha=localStorage.getItem('lhb_sortAlpha')||'az'; sortTime=localStorage.getItem('lhb_sortTime')||'asc'; }
-function saveSort(){ localStorage.setItem('lhb_sortAlpha',sortAlpha); localStorage.setItem('lhb_sortTime',sortTime); updateSortBtns(); }
+function loadSort(){ sortAlpha=localStorage.getItem('lhb_sortAlpha')||'az'; }
+function saveSort(){ localStorage.setItem('lhb_sortAlpha',sortAlpha); updateSortBtns(); }
 function updateSortBtns(){
   document.getElementById('sortAlpha').textContent = sortAlpha==='az' ? '字母 A→Z' : '字母 Z→A';
   document.getElementById('sortAlpha').classList.toggle('active', sortAlpha!=='az');
-  document.getElementById('sortTime').textContent = sortTime==='asc' ? '时间 正序' : '时间 倒序';
-  document.getElementById('sortTime').classList.toggle('active', sortTime!=='asc');
 }
 function toggleAlpha(){ sortAlpha = sortAlpha==='az' ? 'za' : 'az'; saveSort(); applySort(); }
-function toggleTime(){ sortTime = sortTime==='asc' ? 'desc' : 'asc'; saveSort(); applySort(); }
 
 function applySort(){
   let list=[...favs];
   if(sortAlpha==='az') list.sort((a,b)=>a.name.localeCompare(b.name,'zh'));
-  else list.sort((a,b)=>b.name.localeCompare(a.name,'zh'));
-  if(sortTime==='asc') list.sort((a,b)=>a.time-b.time);
-  else list.sort((a,b)=>b.time-a.time);
+  else if(sortAlpha==='za') list.sort((a,b)=>b.name.localeCompare(a.name,'zh'));
+  else list.sort((a,b)=>b.time-a.time); // 默认按添加时间，新的在上（time 大在上）
+  // 字母排序状态下仍保留添加时间倒序作为次级排序（新添加在上）
+  if(sortAlpha==='az'||sortAlpha==='za'){
+    // 字母排序优先，同名字按时间
+  } else {
+    list.sort((a,b)=>b.time-a.time); // 新添加的在上
+  }
   render(list);
-  // 保存排序后的顺序（去掉时间字段）
   localStorage.setItem(getFavKey(),JSON.stringify(list.map(x=>x.name)));
 }
 
@@ -312,7 +307,6 @@ function init(){
   const u=localStorage.getItem('lhb_user');
   document.getElementById('username').textContent=u||'';
   loadSort(); loadFavs(); applySort();
-  // 音乐继续播放，悬浮窗不消失（无需额外处理，播放器在 music.html 独立）
 }
 
 // 初始化

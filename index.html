@@ -13,7 +13,6 @@
   --text:#1a1a2e; --text2:#4a4a6a;
   --border:#e8ecf4;
   --shadow:0 8px 24px rgba(79,124,255,.12);
-  --shadow-glow:0 12px 32px rgba(168,85,247,.22);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{scrollbar-width:thin;scrollbar-color:var(--purple) var(--border);}
@@ -48,7 +47,7 @@ body{
 .topbtns button:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 8px 20px rgba(79,124,255,.35);}
 .username{color:var(--purple);font-size:14px;font-weight:700;}
 
-/* 公告 */
+/* 公告（最新一条，JS 驱动从右往左滚动） */
 .announce{
   margin:14px 0;background:var(--card);border:1px solid var(--border);border-radius:16px;
   padding:14px 16px;box-shadow:var(--shadow);overflow:hidden;
@@ -56,10 +55,8 @@ body{
 .announce-title{font-size:14px;color:var(--orange);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
 .announce-title .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);animation:blink 1.2s infinite;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
-.announce-track{position:relative;height:24px;overflow:hidden;}
-.announce-track .marquee{position:absolute;white-space:nowrap;font-size:15px;color:var(--text2);
-  animation:marquee 22s linear infinite;}
-@keyframes marquee{0%{transform:translateX(100%);}100%{transform:translateX(-100%);}}
+.announce-track{position:relative;height:24px;overflow:hidden;white-space:nowrap;}
+.announce-track .marquee{position:absolute;left:100%;top:0;white-space:nowrap;font-size:15px;color:var(--text2);}
 
 /* 卡片 */
 .cards{display:flex;flex-direction:column;gap:18px;margin-top:10px;}
@@ -139,11 +136,6 @@ body{
       <div class="info"><h2>音乐播放器</h2><p>在线听歌 · 歌词 · 收藏</p></div>
       <div class="arrow">›</div>
     </a>
-    <a class="card card-pink" href="favorites.html">
-      <div class="icon">♡</div>
-      <div class="info"><h2>我的收藏</h2><p>收藏夹 · 一键播放</p></div>
-      <div class="arrow">›</div>
-    </a>
     <div class="card card-gray">
       <div class="icon">⚙️</div>
       <div class="info"><h2>更多工具</h2><p>敬请期待</p></div>
@@ -192,23 +184,39 @@ function toast(msg){
   toastTimer=setTimeout(()=>t.classList.remove('show'),2000);
 }
 
-// 公告加载（保留全部历史，取最新几条滚动）
+// 公告：只显示最新一条，只取内容；JS 驱动从右往左滚动，一条播完从头开始
+let scrollTimer=null;
+function startMarquee(text){
+  const marquee=document.getElementById('marquee');
+  marquee.textContent=text;
+  marquee.style.left='100%';
+  const track=document.querySelector('.announce-track');
+  const distance=track.clientWidth+marquee.scrollWidth;
+  const duration=Math.max(8,distance/40); // 速度恒定，按长度算时长
+  marquee.style.transition='none';
+  marquee.style.left='100%';
+  // 强制重绘
+  void marquee.offsetWidth;
+  marquee.style.transition='left '+duration+'s linear';
+  marquee.style.left='-'+(marquee.scrollWidth)+'px';
+  clearTimeout(scrollTimer);
+  // 播完后从头开始
+  scrollTimer=setTimeout(()=>startMarquee(text),duration*1000);
+}
 async function loadAnnouncements(){
   try{
     const r=await fetch(API+'/announcement');
     const data=await r.json();
     const list=(data&&data.data)||[];
-    const marquee=document.getElementById('marquee');
     if(list.length){
-      marquee.textContent=list.map(a=>{
-        const t=a.title?('【'+a.title+'】'):'';
-        return t+(a.content||'');
-      }).join('　　·　　');
+      // 只显示最新一条，只取内容
+      const latest=list[list.length-1];
+      startMarquee(latest.content||latest.title||'欢迎使用工具箱！');
     } else {
-      marquee.textContent='欢迎使用工具箱！';
+      startMarquee('欢迎使用工具箱！');
     }
   }catch(e){
-    document.getElementById('marquee').textContent='欢迎使用工具箱！';
+    startMarquee('欢迎使用工具箱！');
   }
 }
 

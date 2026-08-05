@@ -54,16 +54,11 @@ body{
 .close-x:hover{color:var(--purple);}
 .modal-box h3{margin-bottom:6px;font-size:20px;color:var(--text);}
 .hint{font-size:13px;color:var(--text2);margin-bottom:16px;}
-.captcha-code{font-size:34px;letter-spacing:10px;font-weight:800;color:var(--primary);margin-bottom:16px;user-select:none;
+.captcha-code{font-size:34px;letter-spacing:10px;font-weight:800;margin-bottom:16px;user-select:none;
   background:linear-gradient(90deg,var(--primary),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .captcha-input{width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:#f7f9ff;color:var(--text);font-size:22px;letter-spacing:8px;text-align:center;outline:none;transition:border-color .2s;}
 .captcha-input:focus{border-color:var(--primary);}
 .err{color:#f43f5e;font-size:14px;margin-top:12px;min-height:20px;}
-.modal-btn{width:100%;padding:12px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-top:10px;color:#fff;
-  background:linear-gradient(90deg,var(--primary),var(--purple));box-shadow:0 6px 16px rgba(79,124,255,.3);
-  transition:transform .15s ease;}
-.modal-btn:active{transform:scale(.96);}
-.modal-btn:disabled{opacity:.5;}
 
 /* 轻提示 */
 .toast{position:fixed;left:50%;top:15%;transform:translateX(-50%) translateY(-10px);background:var(--card);color:var(--text);
@@ -91,14 +86,13 @@ body{
     <div class="captcha-code" id="captchaCode">1234</div>
     <input class="captcha-input" id="captchaInput" maxlength="4" inputmode="numeric" placeholder="····" autocomplete="off">
     <div class="err" id="captchaErr"></div>
-    <button class="modal-btn" id="btnConfirm" onclick="verifyCaptcha()" disabled>确认下载</button>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const CDN='https://cdn.jsdelivr.net/gh/zuiaidiuguo/lhb2009-website@master/';
+const CDN='https://cdn.jsdmirror.cn/gh/zuiaidiuguo/lhb2009-website@master/';
 const tools=[
   {name:'截屏',file:'截屏.zip'},
   {name:'解压',file:'解压.zip'},
@@ -144,7 +138,7 @@ function openCaptcha(tool){
   currentTool=tool;
   genCaptcha();
   const inp=document.getElementById('captchaInput');
-  inp.value=''; document.getElementById('captchaErr').textContent=''; document.getElementById('btnConfirm').disabled=true;
+  inp.value=''; document.getElementById('captchaErr').textContent='';
   document.getElementById('captchaModal').classList.add('show');
   setTimeout(()=>inp.focus(),100);
 }
@@ -152,12 +146,11 @@ function openCaptcha(tool){
 const input=document.getElementById('captchaInput');
 input.addEventListener('input',()=>{
   const v=input.value;
-  document.getElementById('btnConfirm').disabled = v.length<4;
-  if(v.length===4) verifyCaptcha();
+  if(v.length===4) autoVerify(v); // 输入满4位自动匹配
 });
 
-function verifyCaptcha(){
-  const v=input.value;
+// 输入4位后自动匹配，正确即触发下载
+function autoVerify(v){
   if(v===captchaCode){
     document.getElementById('captchaErr').textContent='';
     document.getElementById('captchaModal').classList.remove('show');
@@ -165,11 +158,11 @@ function verifyCaptcha(){
     const a=document.createElement('a');
     a.href=url; a.download=currentTool.file; a.rel='noopener';
     document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(()=>{ if(!document.getElementById('captchaModal').classList.contains('show')) toast('开始下载：'+currentTool.file); },200);
+    toast('开始下载：'+currentTool.file);
   } else {
     const err=document.getElementById('captchaErr');
     err.textContent='验证码错误，请重新输入';
-    setTimeout(()=>{ err.textContent=''; genCaptcha(); input.value=''; document.getElementById('btnConfirm').disabled=true; },1200);
+    setTimeout(()=>{ err.textContent=''; genCaptcha(); input.value=''; },1200);
   }
 }
 

@@ -63,6 +63,12 @@ body{
 .btn-gold{background:linear-gradient(90deg,var(--orange),#f59e0b);box-shadow:0 4px 12px rgba(251,146,60,.3);}
 .btn-blue{background:linear-gradient(90deg,var(--primary),#6a96ff);box-shadow:0 4px 12px rgba(79,124,255,.3);}
 .msg{color:#10b981;font-size:13px;margin-top:10px;min-height:18px;}
+.msg.err{color:#f43f5e;}
+
+.hist-item{padding:12px 14px;border-bottom:1px solid var(--border);}
+.hist-item:last-child{border-bottom:none;}
+.hist-item .content{font-size:15px;color:var(--text);}
+.hist-item .time{font-size:12px;color:var(--text2);margin-top:4px;}
 
 .list-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);}
 .list-item:last-child{border-bottom:none;}
@@ -86,10 +92,12 @@ body{
 .total-visits .stat .lab{font-size:13px;color:var(--text2);margin-top:4px;}
 
 /* 登录 */
-.login-wrap{max-width:340px;margin:60px auto;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:34px 28px;box-shadow:0 20px 50px rgba(79,124,255,.2);}
-.login-wrap h1{font-size:24px;margin-bottom:20px;color:var(--text);
+.login-wrap{max-width:340px;margin:40px auto;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:30px 28px;box-shadow:0 20px 50px rgba(79,124,255,.2);}
+.login-wrap h1{font-size:22px;margin-bottom:18px;color:var(--text);
   background:linear-gradient(90deg,var(--primary),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.login-wrap .field input{text-align:center;letter-spacing:4px;font-size:20px;}
+.login-tabs{display:flex;gap:8px;margin-bottom:20px;}
+.login-tab{flex:1;padding:9px;border-radius:14px;border:1px solid var(--border);background:#f7f9ff;color:var(--text2);font-size:14px;font-weight:600;cursor:pointer;transition:all .25s;}
+.login-tab.active{background:linear-gradient(90deg,var(--primary),var(--purple));color:#fff;border-color:transparent;}
 .login-err{color:#f43f5e;margin-top:10px;min-height:20px;font-size:13px;}
 .login-tip{margin-top:16px;font-size:13px;color:var(--text2);}
 .login-tip a{color:var(--primary);cursor:pointer;font-weight:600;}
@@ -111,6 +119,7 @@ body{
 .modal-btn:active{transform:scale(.96);}
 .modal-btn.danger{background:linear-gradient(90deg,#fb7185,#f43f5e);box-shadow:0 6px 16px rgba(244,63,94,.3);}
 .modal-text{text-align:center;color:var(--text2);font-size:15px;margin-bottom:18px;line-height:1.6;}
+.modal-err{color:#f43f5e;font-size:13px;text-align:center;min-height:18px;margin-bottom:6px;}
 
 /* 轻提示 */
 .toast{position:fixed;left:50%;top:15%;transform:translateX(-50%) translateY(-10px);background:var(--card);color:var(--text);
@@ -129,27 +138,41 @@ body{
 
   <div id="loginBox">
     <div class="login-wrap">
-      <h1>🔐 管理员登录</h1>
-      <div class="field"><input type="password" id="adminPass" placeholder="输入管理密码"></div>
-      <div class="login-err" id="loginErr"></div>
-      <button class="btn btn-blue" style="width:100%;" onclick="verifyPass()">进 入</button>
-      <div class="login-tip">没有账号？请<a onclick="toast('请联系管理员添加账号')">联系管理员添加账号</a></div>
+      <h1>🔐 登录</h1>
+      <div class="login-tabs">
+        <div class="login-tab active" id="ltUser" onclick="switchLogin('user')">用户登录</div>
+        <div class="login-tab" id="ltAdmin" onclick="switchLogin('admin')">管理员登录</div>
+      </div>
+      <!-- 用户登录 -->
+      <div id="userLogin">
+        <div class="field"><label>用户名</label><input id="loginUser" placeholder="请输入用户名"></div>
+        <div class="field"><label>密码</label><input type="password" id="loginPass" placeholder="请输入密码"></div>
+        <div class="login-err" id="userLoginErr"></div>
+        <button class="btn btn-blue" style="width:100%;" onclick="userLogin()">登 录</button>
+        <div class="login-tip">没有账号？请联系管理员添加账号</div>
+      </div>
+      <!-- 管理员登录 -->
+      <div id="adminLogin" style="display:none;">
+        <div class="field"><label>管理密码</label><input type="password" id="adminPass" placeholder="输入管理密码"></div>
+        <div class="login-err" id="adminLoginErr"></div>
+        <button class="btn btn-blue" style="width:100%;" onclick="verifyPass()">进 入</button>
+      </div>
     </div>
   </div>
 
   <div id="adminPanel" style="display:none;">
     <div class="tabs" id="tabs">
       <div class="tab t0 active" data-tab="0">📢 发布公告</div>
-      <div class="tab t1" data-tab="1">👤 注册用户</div>
-      <div class="tab t2" data-tab="2">👥 用户列表</div>
-      <div class="tab t3" data-tab="3">🎵 歌曲请求</div>
-      <div class="tab t4" data-tab="4">📊 访问统计</div>
+      <div class="tab t1" data-tab="1">📜 公告历史</div>
+      <div class="tab t2" data-tab="2">👤 注册用户</div>
+      <div class="tab t3" data-tab="3">👥 用户列表</div>
+      <div class="tab t4" data-tab="4">🎵 歌曲请求</div>
+      <div class="tab t5" data-tab="5">📊 访问统计</div>
     </div>
 
     <div class="panel show" id="panel0">
       <div class="box">
         <h3>发布公告</h3>
-        <div class="field"><label>标题</label><input id="annTitle" placeholder="公告标题"></div>
         <div class="field"><label>内容</label><textarea id="annContent" placeholder="请输入公告内容..."></textarea></div>
         <button class="btn btn-gold" onclick="publishAnn()">发布公告</button>
         <div class="msg" id="annMsg"></div>
@@ -157,6 +180,13 @@ body{
     </div>
 
     <div class="panel" id="panel1">
+      <div class="box">
+        <h3>公告历史</h3>
+        <div id="annHist"></div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel2">
       <div class="box">
         <h3>注册新用户</h3>
         <div class="field"><label>用户名</label><input id="regUser"></div>
@@ -166,21 +196,21 @@ body{
       </div>
     </div>
 
-    <div class="panel" id="panel2">
+    <div class="panel" id="panel3">
       <div class="box">
         <h3>用户列表</h3>
         <div id="userList"></div>
       </div>
     </div>
 
-    <div class="panel" id="panel3">
+    <div class="panel" id="panel4">
       <div class="box">
         <h3>歌曲请求</h3>
         <div id="reqList"></div>
       </div>
     </div>
 
-    <div class="panel" id="panel4">
+    <div class="panel" id="panel5">
       <div class="box">
         <h3>访问统计</h3>
         <div class="total-visits" id="totalStats"></div>
@@ -206,9 +236,9 @@ body{
   <div class="modal-box">
     <button class="close-x" id="closeEdit">✕</button>
     <h3>修改用户密码</h3>
-    <div class="modal-text">用户：<b id="editName" style="color:var(--primary);"></b></div>
+    <div class="field"><label>用户名</label><input id="editName" disabled></div>
     <div class="field"><label>新密码</label><input type="password" id="editPass" placeholder="请输入新密码"></div>
-    <div class="err" id="editErr" style="color:#f43f5e;font-size:13px;text-align:center;min-height:18px;"></div>
+    <div class="modal-err" id="editErr"></div>
     <button class="modal-btn" onclick="confirmEdit()">确认修改</button>
   </div>
 </div>
@@ -240,11 +270,36 @@ function toast(msg){
   toastTimer=setTimeout(()=>t.classList.remove('show'),2000);
 }
 
-// 登录状态保存到 localStorage，刷新不丢失
-function isAuthed(){ return localStorage.getItem(AUTH_KEY)==='1'; }
+// 登录类型切换
+function switchLogin(type){
+  document.getElementById('ltUser').classList.toggle('active',type==='user');
+  document.getElementById('ltAdmin').classList.toggle('active',type==='admin');
+  document.getElementById('userLogin').style.display = type==='user' ? 'block' : 'none';
+  document.getElementById('adminLogin').style.display = type==='admin' ? 'block' : 'none';
+}
+
+// 用户登录（普通用户）
+async function userLogin(){
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value;
+  const err=document.getElementById('userLoginErr');
+  if(!u||!p){ err.textContent='请填写用户名和密码'; return; }
+  try{
+    const r=await fetch(API+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+    const data=await r.json();
+    if(data&&data.code===0){
+      localStorage.setItem('lhb_user',u);
+      err.textContent='';
+      toast('登录成功，欢迎 '+u+'！');
+    } else err.textContent=(data&&data.msg)||'用户名或密码错误';
+  }catch(e){ err.textContent='网络错误，请重试'; }
+}
+document.getElementById('loginPass').addEventListener('keydown',e=>{ if(e.key==='Enter')userLogin(); });
+
+// 管理员登录
 function verifyPass(){
   const p=document.getElementById('adminPass').value;
-  const err=document.getElementById('loginErr');
+  const err=document.getElementById('adminLoginErr');
   if(p===PASSWORD){
     localStorage.setItem(AUTH_KEY,'1');
     err.textContent='';
@@ -257,6 +312,7 @@ function verifyPass(){
 }
 document.getElementById('adminPass').addEventListener('keydown',e=>{ if(e.key==='Enter')verifyPass(); });
 
+function isAuthed(){ return localStorage.getItem(AUTH_KEY)==='1'; }
 function enterAdmin(){
   document.getElementById('loginBox').style.display='none';
   document.getElementById('adminPanel').style.display='block';
@@ -285,7 +341,6 @@ document.getElementById('tabs').addEventListener('click',e=>{
   document.getElementById('panel'+tab.dataset.tab).classList.add('show');
 });
 
-// 弹窗工具
 function hideModal(el){
   const box=el.querySelector('.modal-box');
   if(box) box.classList.add('modal-out');
@@ -293,33 +348,55 @@ function hideModal(el){
 }
 
 function authHeaders(json){ const h={[AUTH_HEADER]:PASSWORD}; if(json) h['Content-Type']='application/json'; return h; }
-async function loadAll(){ loadUsers(); loadRequests(); loadStats(); }
+async function loadAll(){ loadAnnHist(); loadUsers(); loadRequests(); loadStats(); }
 
 // 发布公告
 async function publishAnn(){
-  const title=document.getElementById('annTitle').value.trim();
   const content=document.getElementById('annContent').value.trim();
   const msg=document.getElementById('annMsg');
   if(!content){ msg.textContent=''; document.getElementById('annContent').style.borderColor='#f43f5e'; return; }
   try{
-    const r=await fetch(API+'/announcement',{method:'POST',headers:authHeaders(true),body:JSON.stringify({title,content})});
+    const r=await fetch(API+'/announcement',{method:'POST',headers:authHeaders(true),body:JSON.stringify({content})});
     const data=await r.json();
-    if(data&&data.code===0){ msg.textContent='✓ 公告发布成功'; document.getElementById('annTitle').value=''; document.getElementById('annContent').value=''; }
+    if(data&&data.code===0){ msg.textContent='✓ 公告发布成功'; document.getElementById('annContent').value=''; loadAnnHist(); }
     else msg.textContent='发布失败';
   }catch(e){ msg.textContent='网络错误'; }
+}
+
+// 公告历史（保留全部记录，显示时间+内容）
+async function loadAnnHist(){
+  const el=document.getElementById('annHist');
+  try{
+    const r=await fetch(API+'/announcement',{headers:authHeaders()});
+    const data=await r.json();
+    const list=(data&&data.data)||[];
+    if(!list.length){ el.innerHTML='<div class="hist-item">暂无公告</div>'; return; }
+    // 最新的在上
+    const rev=[...list].reverse();
+    el.innerHTML=rev.map(a=>`
+      <div class="hist-item">
+        <div class="content">${a.content||a.title||'无内容'}</div>
+        <div class="time">🕐 ${a.time||a.created||''}</div>
+      </div>`).join('');
+  }catch(e){ el.innerHTML='<div class="hist-item">加载失败</div>'; }
 }
 
 // 注册用户
 async function adminReg(){
   const u=document.getElementById('regUser').value.trim(), p=document.getElementById('regPass').value;
   const msg=document.getElementById('regMsg');
+  msg.className='msg'; // 重置为绿色
   if(!u||!p){ msg.textContent='请填写用户名和密码'; return; }
   try{
     const r=await fetch(API+'/register',{method:'POST',headers:authHeaders(true),body:JSON.stringify({username:u,password:p})});
     const data=await r.json();
     if(data&&data.code===0){ msg.textContent='✓ 注册成功'; document.getElementById('regUser').value=''; document.getElementById('regPass').value=''; loadUsers(); }
-    else msg.textContent=(data&&data.msg)||'注册失败';
-  }catch(e){ msg.textContent='网络错误'; }
+    else {
+      // 用户名已存在等错误显示红色
+      msg.className='msg err';
+      msg.textContent=(data&&data.msg)||'注册失败';
+    }
+  }catch(e){ msg.className='msg err'; msg.textContent='网络错误'; }
 }
 
 // 用户列表
@@ -342,11 +419,11 @@ async function loadUsers(){
   }catch(e){ el.innerHTML='<div class="list-item">加载失败</div>'; }
 }
 
-// 修改密码（弹窗）
+// 修改密码（弹窗，用户名固定显示，修复「用户名不能为空」bug）
 let editId=null;
 function openEdit(id,name){
   editId=id;
-  document.getElementById('editName').textContent=name;
+  document.getElementById('editName').value=name;
   document.getElementById('editPass').value='';
   document.getElementById('editErr').textContent='';
   document.getElementById('editModal').classList.add('show');
@@ -358,6 +435,7 @@ async function confirmEdit(){
   const err=document.getElementById('editErr');
   if(!newPass){ err.textContent='密码不能为空'; return; }
   try{
+    // 修复：不再重新传 username，只传 id 和 password
     const r=await fetch(API+'/user',{method:'PUT',headers:authHeaders(true),body:JSON.stringify({id:editId,password:newPass})});
     const data=await r.json();
     if(data&&data.code===0){ hideModal(document.getElementById('editModal')); toast('修改成功'); loadUsers(); }
@@ -406,14 +484,13 @@ async function delReq(id){
   }catch(e){ toast('网络错误'); }
 }
 
-// 访问统计（修复：正确读取并展示）
+// 访问统计
 async function loadStats(){
   const statEl=document.getElementById('totalStats');
   try{
     const r=await fetch(API+'/stats/visits',{headers:authHeaders()});
     const data=await r.json();
     const days=(data&&data.data)||[];
-    // 汇总总访问量
     const total=days.reduce((s,d)=>s+(Number(d.count)||0),0);
     statEl.innerHTML=`
       <div class="stat"><div class="num">${total}</div><div class="lab">总访问量</div></div>
@@ -430,7 +507,6 @@ function renderChart(days){
     el.innerHTML='<div style="width:100%;text-align:center;color:var(--text2);padding:40px 0;">暂无统计数据</div>';
     return;
   }
-  // 取最近7天
   const recent=days.slice(-7);
   const max=Math.max(...recent.map(d=>Number(d.count)||0),1);
   el.innerHTML=recent.map(d=>{
@@ -439,7 +515,7 @@ function renderChart(days){
   }).join('');
 }
 
-// 初始化：若已登录则直接进入后台
+// 初始化
 if(isAuthed()){
   enterAdmin();
 } else {
