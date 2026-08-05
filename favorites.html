@@ -5,66 +5,98 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>收藏夹 - 工具箱</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-body {
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
-  background:linear-gradient(135deg,#0d0d1a 0%,#1a0d2a 35%,#2a1040 70%,#0d0a1a 100%);
-  min-height:100vh; color:#f3e8ff;
+:root{
+  --bg1:#f0f4ff; --bg2:#e8f0fe; --bg3:#f5f0ff;
+  --card:#ffffff;
+  --primary:#4f7cff;
+  --purple:#a855f7; --pink:#f472b6; --cyan:#06b6d4; --orange:#fb923c;
+  --text:#1a1a2e; --text2:#4a4a6a;
+  --border:#e8ecf4;
+  --shadow:0 8px 24px rgba(79,124,255,.12);
 }
-.wrap { max-width:860px; margin:0 auto; padding:16px; padding-bottom:40px; }
-.topbar { display:flex; align-items:center; gap:14px; padding:14px 4px 18px; }
-.back { font-size:28px; color:#f472b6; cursor:pointer; text-decoration:none; }
-.title { font-size:24px; font-weight:800; color:#f472b6; flex:1; }
-.topright { display:flex; align-items:center; gap:10px; }
-.username { color:#c084fc; font-size:14px; font-weight:600; }
-.logout { padding:7px 14px; border-radius:18px; border:1px solid rgba(248,113,113,.4); background:rgba(248,113,113,.15); color:#fca5a5; font-size:13px; cursor:pointer; }
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{scrollbar-width:thin;scrollbar-color:var(--pink) var(--border);}
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-track{background:var(--bg2);border-radius:8px;}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--pink),var(--purple));border-radius:8px;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+  background:linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 50%,var(--bg3) 100%);
+  min-height:100vh; color:var(--text);
+  animation:fadeUp .4s ease;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.wrap{max-width:860px;margin:0 auto;padding:16px;padding-bottom:40px;}
+.topbar{display:flex;align-items:center;gap:14px;padding:14px 4px 18px;}
+.back{font-size:30px;color:var(--pink);cursor:pointer;text-decoration:none;font-weight:700;}
+.title{font-size:24px;font-weight:800;flex:1;
+  background:linear-gradient(90deg,var(--pink),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.topright{display:flex;align-items:center;gap:10px;}
+.username{color:var(--purple);font-size:14px;font-weight:700;}
 
 /* 排序工具栏 */
-.sortbar { display:flex; gap:10px; margin-bottom:16px; }
-.sortbtn { flex:1; padding:11px; border-radius:14px; font-size:14px; font-weight:600; cursor:pointer;
-  border:1px solid rgba(168,85,247,.4); background:rgba(255,255,255,.05); color:#a99ec9; transition:all .3s; }
-.sortbtn.active { background:linear-gradient(90deg,#a855f7,#7c3aed); color:#fff; border-color:transparent; }
+.sortbar{display:flex;gap:10px;margin-bottom:16px;}
+.sortbtn{flex:1;padding:11px;border-radius:14px;font-size:14px;font-weight:600;cursor:pointer;
+  border:1px solid var(--border);background:var(--card);color:var(--text2);box-shadow:var(--shadow);transition:all .25s;}
+.sortbtn.active{background:linear-gradient(90deg,var(--pink),var(--purple));color:#fff;border-color:transparent;}
 
 /* 一键播放 */
-.playall { width:100%; padding:14px; border:none; border-radius:16px; font-size:16px; font-weight:700; cursor:pointer; margin-bottom:18px;
-  background:linear-gradient(90deg,#f472b6,#a855f7); color:#fff; transition:filter .3s; }
-.playall:hover { filter:brightness(1.1); }
-.playall:disabled { opacity:.5; cursor:not-allowed; }
+.playall{width:100%;padding:14px;border:none;border-radius:16px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:18px;color:#fff;
+  background:linear-gradient(90deg,var(--pink),var(--purple));box-shadow:0 6px 18px rgba(244,114,182,.35);
+  transition:transform .15s ease;}
+.playall:active{transform:scale(.96);}
+.playall:disabled{opacity:.5;cursor:not-allowed;}
 
 /* 收藏列表 */
-.favlist { display:flex; flex-direction:column; gap:10px; }
-.fav {
-  display:flex; align-items:center; gap:14px; padding:14px 16px; border-radius:14px; cursor:pointer;
-  background:rgba(50,20,70,.4); border-left:4px solid #f472b6; transition:transform .3s, box-shadow .3s;
+.favlist{display:flex;flex-direction:column;gap:10px;}
+.fav{
+  display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;cursor:pointer;
+  background:var(--card);border:1px solid var(--border);border-left:4px solid var(--pink);box-shadow:var(--shadow);
+  transition:transform .25s ease,box-shadow .25s ease;
 }
-.fav:hover { transform:scale(1.02); box-shadow:0 0 20px rgba(244,114,182,.3); }
-.fav .handle { font-size:22px; color:#8b84a8; cursor:grab; user-select:none; }
-.fav .handle:active { cursor:grabbing; }
-.fav .nm { flex:1; font-size:16px; font-weight:600; }
-.fav .rm { font-size:13px; color:#f87171; border:1px solid rgba(248,113,113,.4); padding:5px 12px; border-radius:14px; cursor:pointer; }
+.fav:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 10px 24px rgba(244,114,182,.22);}
+.fav .handle{font-size:22px;color:var(--text2);cursor:grab;user-select:none;}
+.fav .handle:active{cursor:grabbing;}
+.fav .nm{flex:1;font-size:16px;font-weight:600;color:var(--text);}
+.fav .rm{font-size:13px;color:#f43f5e;border:1px solid var(--pink);padding:5px 12px;border-radius:14px;cursor:pointer;background:#fff;transition:all .2s;}
+.fav .rm:hover{background:linear-gradient(90deg,#fb7185,#f43f5e);color:#fff;}
 
 /* 空状态 */
-.empty { text-align:center; padding:60px 0; color:#8b84a8; }
-.empty .big { font-size:50px; margin-bottom:14px; }
-.empty p { font-size:16px; }
+.empty{text-align:center;padding:60px 0;color:var(--text2);}
+.empty .big{font-size:50px;margin-bottom:14px;}
+.empty p{font-size:16px;}
 
 /* 登录弹窗 */
-.modal-mask { position:fixed; inset:0; background:rgba(0,0,0,.65); display:none; align-items:center; justify-content:center; z-index:999; }
-.modal-mask.show { display:flex; }
-.modal-box { width:90%; max-width:340px; background:#1a1030; border:1px solid rgba(168,85,247,.4); border-radius:18px; padding:26px 22px; position:relative; }
-.modal-box h3 { text-align:center; margin-bottom:18px; font-size:20px; color:#f3e8ff; }
-.close-x { position:absolute; top:10px; right:14px; font-size:22px; color:#8b84a8; cursor:pointer; background:none; border:none; }
-.close-x:hover { color:#fff; }
-.field { margin-bottom:14px; }
-.field label { display:block; font-size:13px; color:#a99ec9; margin-bottom:6px; }
-.field input { width:100%; padding:11px 14px; border-radius:10px; border:1px solid rgba(168,85,247,.35); background:rgba(255,255,255,.05); color:#fff; font-size:15px; outline:none; }
-.field input:focus { border-color:#f472b6; }
-.modal-btn { width:100%; padding:12px; border:none; border-radius:12px; font-size:16px; font-weight:700; cursor:pointer; margin-top:6px;
-  background:linear-gradient(90deg,#a855f7,#7c3aed); color:#fff; }
-.modal-btn:hover { filter:brightness(1.1); }
-.err { color:#f87171; font-size:13px; text-align:center; margin-top:8px; min-height:18px; }
-.switch { text-align:center; margin-top:14px; font-size:13px; color:#a99ec9; }
-.switch a { color:#c084fc; cursor:pointer; }
+.modal-mask{position:fixed;inset:0;background:rgba(30,40,80,.4);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:999;}
+.modal-mask.show{display:flex;}
+.modal-box{width:90%;max-width:340px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:26px 22px;position:relative;
+  box-shadow:0 20px 50px rgba(79,124,255,.25);animation:modalIn .25s ease;}
+@keyframes modalIn{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:scale(1);}}
+.modal-box h3{text-align:center;margin-bottom:18px;font-size:20px;color:var(--text);}
+.close-x{position:absolute;top:10px;right:14px;font-size:22px;color:var(--text2);cursor:pointer;background:none;border:none;}
+.close-x:hover{color:var(--purple);}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:13px;color:var(--text2);margin-bottom:6px;}
+.field input{width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--border);background:#f7f9ff;color:var(--text);font-size:15px;outline:none;transition:border-color .2s;}
+.field input:focus{border-color:var(--pink);}
+.modal-btn{width:100%;padding:12px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-top:6px;color:#fff;
+  background:linear-gradient(90deg,var(--primary),var(--purple));box-shadow:0 6px 16px rgba(79,124,255,.3);
+  transition:transform .15s ease;}
+.modal-btn:active{transform:scale(.96);}
+.err{color:#f43f5e;font-size:13px;text-align:center;margin-top:8px;min-height:18px;}
+.switch{text-align:center;margin-top:14px;font-size:13px;color:var(--text2);}
+.switch a{color:var(--primary);cursor:pointer;font-weight:600;}
+
+/* 提示小方框（未登录） */
+.login-hint{
+  position:fixed;left:50%;top:35%;transform:translateX(-50%) translateY(-10px);
+  background:var(--card);color:var(--text);padding:14px 26px;border-radius:14px;
+  box-shadow:0 12px 34px rgba(79,124,255,.3);font-size:15px;font-weight:600;z-index:3000;
+  border:2px solid var(--pink);opacity:0;pointer-events:none;
+  transition:opacity .35s ease,transform .35s ease;
+}
+.login-hint.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
@@ -74,7 +106,6 @@ body {
     <span class="title">♡ 收藏夹</span>
     <div class="topright">
       <span class="username" id="username"></span>
-      <button class="logout" onclick="logout()">退出</button>
     </div>
   </div>
 
@@ -91,6 +122,9 @@ body {
     <p>暂无收藏歌曲</p>
   </div>
 </div>
+
+<!-- 未登录提示小方框 -->
+<div class="login-hint" id="loginHint">你还未登录，请先登录</div>
 
 <!-- 登录弹窗 -->
 <div class="modal-mask" id="loginModal">
@@ -170,6 +204,7 @@ function render(list){
   shown.forEach((item,i)=>{
     const d=document.createElement('div');
     d.className='fav';
+    d.style.animation='itemIn .3s ease '+(i*0.05)+'s both';
     d.innerHTML=`<span class="handle" draggable="false">≡</span>
       <span class="nm">${item.name}</span>
       <span class="rm" onclick="removeFav('${i}')">移除</span>`;
@@ -178,6 +213,8 @@ function render(list){
     listEl.appendChild(d);
   });
 }
+const itemInKey='@keyframes itemIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}';
+const st=document.createElement('style');st.textContent=itemInKey;document.head.appendChild(st);
 
 // 拖拽排序（鼠标）
 listEl.addEventListener('mousemove',(e)=>{
@@ -214,19 +251,34 @@ function removeFav(i){
   saveFavs(); applySort();
 }
 
-// 一键播放
+// 一键播放：返回时回到收藏夹界面
 function playAll(){
   if(!favs.length) return;
-  location.href='music.html?play=fav';
+  location.href='music.html?play=fav&from=fav';
+}
+
+// 未登录提示小方框 + 自动弹出登录弹窗
+function showLoginHint(){
+  const hint=document.getElementById('loginHint');
+  hint.classList.add('show');
+  setTimeout(()=>{
+    hint.classList.remove('show');
+    setTimeout(()=>showLogin(),400);
+  },1500);
 }
 
 // 登录/注册
 function showLogin(){ document.getElementById('regModal').classList.remove('show'); document.getElementById('loginModal').classList.add('show'); }
 function showReg(){ document.getElementById('loginModal').classList.remove('show'); document.getElementById('regModal').classList.add('show'); }
-document.getElementById('closeLogin').onclick=()=>document.getElementById('loginModal').classList.remove('show');
-document.getElementById('closeReg').onclick=()=>document.getElementById('regModal').classList.remove('show');
-document.getElementById('loginModal').addEventListener('click',e=>{ if(e.target.id==='loginModal')e.target.classList.remove('show'); });
-document.getElementById('regModal').addEventListener('click',e=>{ if(e.target.id==='regModal')e.target.classList.remove('show'); });
+function hideModal(el){
+  const box=el.querySelector('.modal-box');
+  if(box) box.classList.add('modal-out');
+  setTimeout(()=>{ el.classList.remove('show'); if(box) box.classList.remove('modal-out'); },180);
+}
+document.getElementById('closeLogin').onclick=()=>hideModal(document.getElementById('loginModal'));
+document.getElementById('closeReg').onclick=()=>hideModal(document.getElementById('regModal'));
+document.getElementById('loginModal').addEventListener('click',e=>{ if(e.target.id==='loginModal')hideModal(e.target); });
+document.getElementById('regModal').addEventListener('click',e=>{ if(e.target.id==='regModal')hideModal(e.target); });
 async function doLogin(){
   const u=document.getElementById('loginUser').value.trim(), p=document.getElementById('loginPass').value;
   const err=document.getElementById('loginErr');
@@ -234,8 +286,11 @@ async function doLogin(){
   try{
     const r=await fetch(API+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
     const data=await r.json();
-    if(data&&data.code===0){ localStorage.setItem('lhb_user',u); err.textContent=''; document.getElementById('loginModal').classList.remove('show'); init(); }
-    else err.textContent=(data&&data.msg)||'用户名或密码错误';
+    if(data&&data.code===0){
+      localStorage.setItem('lhb_user',u); err.textContent='';
+      hideModal(document.getElementById('loginModal'));
+      init(); // 登录成功后自动进入收藏夹界面
+    } else err.textContent=(data&&data.msg)||'用户名或密码错误';
   }catch(e){ err.textContent='网络错误，请重试'; }
 }
 async function doReg(){
@@ -245,21 +300,27 @@ async function doReg(){
   try{
     const r=await fetch(API+'/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
     const data=await r.json();
-    if(data&&data.code===0){ localStorage.setItem('lhb_user',u); err.textContent=''; document.getElementById('regModal').classList.remove('show'); init(); }
-    else err.textContent=(data&&data.msg)||'注册失败';
+    if(data&&data.code===0){
+      localStorage.setItem('lhb_user',u); err.textContent='';
+      hideModal(document.getElementById('regModal'));
+      init();
+    } else err.textContent=(data&&data.msg)||'注册失败';
   }catch(e){ err.textContent='网络错误，请重试'; }
 }
-function logout(){ localStorage.removeItem('lhb_user'); location.href='index.html'; }
 
 function init(){
   const u=localStorage.getItem('lhb_user');
   document.getElementById('username').textContent=u||'';
   loadSort(); loadFavs(); applySort();
+  // 音乐继续播放，悬浮窗不消失（无需额外处理，播放器在 music.html 独立）
 }
 
 // 初始化
-if(!localStorage.getItem('lhb_user')){ showLogin(); }
-init();
+if(!localStorage.getItem('lhb_user')){
+  showLoginHint(); // 显示「还未登录」提示，然后自动弹登录框
+} else {
+  init();
+}
 </script>
 </body>
 </html>
