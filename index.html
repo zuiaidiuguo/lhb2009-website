@@ -100,8 +100,7 @@ body{
   transition:transform .15s ease;}
 .modal-btn:active{transform:scale(.96);}
 .err{color:#f43f5e;font-size:13px;text-align:center;margin-top:8px;min-height:18px;}
-.switch{text-align:center;margin-top:14px;font-size:13px;color:var(--text2);}
-.switch a{color:var(--primary);cursor:pointer;font-weight:600;}
+.tip{text-align:center;margin-top:14px;font-size:13px;color:var(--text2);}
 
 /* 轻提示 toast */
 .toast{position:fixed;left:50%;top:15%;transform:translateX(-50%) translateY(-10px);background:var(--card);color:var(--text);
@@ -133,7 +132,7 @@ body{
     </a>
     <a class="card card-pink" href="music.html">
       <div class="icon">🎵</div>
-      <div class="info"><h2>音乐播放器</h2><p>在线听歌 · 歌词 · 收藏</p></div>
+      <div class="info"><h2>音乐播放器</h2><p>在线听歌 · 歌词</p></div>
       <div class="arrow">›</div>
     </a>
     <div class="card card-gray">
@@ -153,20 +152,7 @@ body{
     <div class="field"><label>密码</label><input id="loginPass" type="password" placeholder="请输入密码"></div>
     <div class="err" id="loginErr"></div>
     <button class="modal-btn" onclick="doLogin()">登 录</button>
-    <div class="switch">没有账号？<a onclick="showReg()">立即注册</a></div>
-  </div>
-</div>
-
-<!-- 注册弹窗 -->
-<div class="modal-mask" id="regModal">
-  <div class="modal-box" id="regBox">
-    <button class="close-x" id="closeReg">✕</button>
-    <h3>注册</h3>
-    <div class="field"><label>用户名</label><input id="regUser" placeholder="请输入用户名"></div>
-    <div class="field"><label>密码</label><input id="regPass" type="password" placeholder="请输入密码"></div>
-    <div class="err" id="regErr"></div>
-    <button class="modal-btn" onclick="doReg()">注 册</button>
-    <div class="switch">已有账号？<a onclick="showLogin()">去登录</a></div>
+    <div class="tip">没有账号？请联系管理员添加账号</div>
   </div>
 </div>
 
@@ -192,15 +178,13 @@ function startMarquee(text){
   marquee.style.left='100%';
   const track=document.querySelector('.announce-track');
   const distance=track.clientWidth+marquee.scrollWidth;
-  const duration=Math.max(8,distance/40); // 速度恒定，按长度算时长
+  const duration=Math.max(8,distance/40);
   marquee.style.transition='none';
   marquee.style.left='100%';
-  // 强制重绘
   void marquee.offsetWidth;
   marquee.style.transition='left '+duration+'s linear';
   marquee.style.left='-'+(marquee.scrollWidth)+'px';
   clearTimeout(scrollTimer);
-  // 播完后从头开始
   scrollTimer=setTimeout(()=>startMarquee(text),duration*1000);
 }
 async function loadAnnouncements(){
@@ -209,8 +193,9 @@ async function loadAnnouncements(){
     const data=await r.json();
     const list=(data&&data.data)||[];
     if(list.length){
-      // 只显示最新一条，只取内容
-      const latest=list[list.length-1];
+      // 取最新一条：按时间倒序排，取第一条
+      const sorted=[...list].sort((a,b)=>(new Date(b.time||b.created||0))-(new Date(a.time||a.created||0)));
+      const latest=sorted[0];
       startMarquee(latest.content||latest.title||'欢迎使用工具箱！');
     } else {
       startMarquee('欢迎使用工具箱！');
@@ -235,18 +220,15 @@ function updateLoginUI(){
 }
 function logout(){ localStorage.removeItem('lhb_user'); updateLoginUI(); toast('已退出登录'); }
 
-// 弹窗切换（带动画）
+// 弹窗
 function hideModal(el){
   const box=el.querySelector('.modal-box');
   if(box) box.classList.add('modal-out');
   setTimeout(()=>{ el.classList.remove('show'); if(box) box.classList.remove('modal-out'); },180);
 }
-function showLogin(){ document.getElementById('regModal').classList.remove('show'); document.getElementById('loginModal').classList.add('show'); }
-function showReg(){ document.getElementById('loginModal').classList.remove('show'); document.getElementById('regModal').classList.add('show'); }
+function showLogin(){ document.getElementById('loginModal').classList.add('show'); }
 document.getElementById('closeLogin').onclick=()=>hideModal(document.getElementById('loginModal'));
-document.getElementById('closeReg').onclick=()=>hideModal(document.getElementById('regModal'));
 document.getElementById('loginModal').addEventListener('click',e=>{ if(e.target.id==='loginModal')hideModal(e.target); });
-document.getElementById('regModal').addEventListener('click',e=>{ if(e.target.id==='regModal')hideModal(e.target); });
 
 async function doLogin(){
   const u=document.getElementById('loginUser').value.trim();
@@ -268,26 +250,6 @@ async function doLogin(){
   }catch(e){ err.textContent='网络错误，请重试'; }
 }
 document.getElementById('loginPass').addEventListener('keydown',e=>{ if(e.key==='Enter')doLogin(); });
-
-async function doReg(){
-  const u=document.getElementById('regUser').value.trim();
-  const p=document.getElementById('regPass').value;
-  const err=document.getElementById('regErr');
-  if(!u||!p){ err.textContent='请填写用户名和密码'; return; }
-  try{
-    const r=await fetch(API+'/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
-    const data=await r.json();
-    if(data&&data.code===0){
-      localStorage.setItem('lhb_user',u);
-      err.textContent='';
-      hideModal(document.getElementById('regModal'));
-      updateLoginUI();
-      toast('注册成功，已自动登录！');
-    } else {
-      err.textContent=(data&&data.msg)||'注册失败';
-    }
-  }catch(e){ err.textContent='网络错误，请重试'; }
-}
 
 updateLoginUI();
 loadAnnouncements();

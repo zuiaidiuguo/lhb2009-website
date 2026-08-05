@@ -44,22 +44,6 @@ body{
 .item .nm{font-size:17px;font-weight:600;color:var(--text);}
 .item .dl{font-size:13px;color:#fff;background:linear-gradient(90deg,var(--cyan),var(--primary));padding:6px 16px;border-radius:20px;box-shadow:0 4px 12px rgba(6,182,212,.3);}
 
-/* 验证码弹窗 */
-.modal-mask{position:fixed;inset:0;background:rgba(30,40,80,.4);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:999;}
-.modal-mask.show{display:flex;}
-.modal-box{width:90%;max-width:340px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:26px 22px;position:relative;text-align:center;
-  box-shadow:0 20px 50px rgba(79,124,255,.25);animation:modalIn .25s ease;}
-@keyframes modalIn{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:scale(1);}}
-.close-x{position:absolute;top:10px;right:14px;font-size:22px;color:var(--text2);cursor:pointer;background:none;border:none;}
-.close-x:hover{color:var(--purple);}
-.modal-box h3{margin-bottom:6px;font-size:20px;color:var(--text);}
-.hint{font-size:13px;color:var(--text2);margin-bottom:16px;}
-.captcha-code{font-size:34px;letter-spacing:10px;font-weight:800;margin-bottom:16px;user-select:none;
-  background:linear-gradient(90deg,var(--primary),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.captcha-input{width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:#f7f9ff;color:var(--text);font-size:22px;letter-spacing:8px;text-align:center;outline:none;transition:border-color .2s;}
-.captcha-input:focus{border-color:var(--primary);}
-.err{color:#f43f5e;font-size:14px;margin-top:12px;min-height:20px;}
-
 /* 轻提示 */
 .toast{position:fixed;left:50%;top:15%;transform:translateX(-50%) translateY(-10px);background:var(--card);color:var(--text);
   padding:12px 22px;border-radius:12px;box-shadow:0 10px 30px rgba(79,124,255,.3);font-size:15px;font-weight:600;z-index:2000;opacity:0;
@@ -75,18 +59,6 @@ body{
   </div>
 
   <div class="list" id="list"></div>
-</div>
-
-<!-- 验证码弹窗 -->
-<div class="modal-mask" id="captchaModal">
-  <div class="modal-box">
-    <button class="close-x" id="closeCaptcha">✕</button>
-    <h3>下载验证</h3>
-    <div class="hint">请输入4位验证码</div>
-    <div class="captcha-code" id="captchaCode">1234</div>
-    <input class="captcha-input" id="captchaInput" maxlength="4" inputmode="numeric" placeholder="····" autocomplete="off">
-    <div class="err" id="captchaErr"></div>
-  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -124,53 +96,22 @@ function renderList(){
     d.style.animation='itemIn .3s ease '+(i*0.05)+'s both';
     // 列表只显示文件名
     d.innerHTML=`<span class="nm">${t.file}</span><span class="dl">下载</span>`;
-    d.onclick=()=>openCaptcha(t);
+    // 点击直接下载，不再弹验证码
+    d.onclick=()=>downloadTool(t);
     listEl.appendChild(d);
   });
 }
 const itemInKey='@keyframes itemIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}';
 const style=document.createElement('style');style.textContent=itemInKey;document.head.appendChild(style);
 
-// 验证码
-let currentTool=null, captchaCode='';
-function genCaptcha(){ captchaCode=String(Math.floor(1000+Math.random()*9000)); document.getElementById('captchaCode').textContent=captchaCode; }
-function openCaptcha(tool){
-  currentTool=tool;
-  genCaptcha();
-  const inp=document.getElementById('captchaInput');
-  inp.value=''; document.getElementById('captchaErr').textContent='';
-  document.getElementById('captchaModal').classList.add('show');
-  setTimeout(()=>inp.focus(),100);
+// 直接触发下载（无验证码）
+function downloadTool(tool){
+  const url=CDN+encodeURIComponent(tool.file);
+  const a=document.createElement('a');
+  a.href=url; a.download=tool.file; a.rel='noopener';
+  document.body.appendChild(a); a.click(); a.remove();
+  toast('开始下载：'+tool.file);
 }
-
-const input=document.getElementById('captchaInput');
-input.addEventListener('input',()=>{
-  const v=input.value;
-  if(v.length===4) autoVerify(v); // 输入满4位自动匹配
-});
-
-// 输入4位后自动匹配，正确即触发下载
-function autoVerify(v){
-  if(v===captchaCode){
-    document.getElementById('captchaErr').textContent='';
-    document.getElementById('captchaModal').classList.remove('show');
-    const url=CDN+encodeURIComponent(currentTool.file);
-    const a=document.createElement('a');
-    a.href=url; a.download=currentTool.file; a.rel='noopener';
-    document.body.appendChild(a); a.click(); a.remove();
-    toast('开始下载：'+currentTool.file);
-  } else {
-    const err=document.getElementById('captchaErr');
-    err.textContent='验证码错误，请重新输入';
-    setTimeout(()=>{ err.textContent=''; genCaptcha(); input.value=''; },1200);
-  }
-}
-
-// 关闭
-function closeCaptcha(){ document.getElementById('captchaModal').classList.remove('show'); }
-document.getElementById('closeCaptcha').onclick=closeCaptcha;
-document.getElementById('captchaModal').addEventListener('click',e=>{ if(e.target.id==='captchaModal')closeCaptcha(); });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeCaptcha(); });
 
 renderList();
 </script>

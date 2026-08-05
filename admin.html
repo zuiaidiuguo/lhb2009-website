@@ -52,6 +52,8 @@ body{
 .panel.show{display:block;}
 .box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:var(--shadow);}
 .box h3{margin-bottom:16px;font-size:18px;color:var(--text);}
+.box-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.box-head h3{margin-bottom:0;}
 
 .field{margin-bottom:14px;}
 .field label{display:block;font-size:13px;color:var(--text2);margin-bottom:6px;}
@@ -62,13 +64,16 @@ body{
 .btn:active{transform:scale(.96);}
 .btn-gold{background:linear-gradient(90deg,var(--orange),#f59e0b);box-shadow:0 4px 12px rgba(251,146,60,.3);}
 .btn-blue{background:linear-gradient(90deg,var(--primary),#6a96ff);box-shadow:0 4px 12px rgba(79,124,255,.3);}
+.btn-red{background:linear-gradient(90deg,#fb7185,#f43f5e);box-shadow:0 4px 12px rgba(244,63,94,.3);}
 .msg{color:#10b981;font-size:13px;margin-top:10px;min-height:18px;}
 .msg.err{color:#f43f5e;}
 
-.hist-item{padding:12px 14px;border-bottom:1px solid var(--border);}
+.hist-item{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
 .hist-item:last-child{border-bottom:none;}
-.hist-item .content{font-size:15px;color:var(--text);}
+.hist-item .content{flex:1;font-size:15px;color:var(--text);}
 .hist-item .time{font-size:12px;color:var(--text2);margin-top:4px;}
+.hist-item .del{color:#f43f5e;font-size:13px;cursor:pointer;padding:4px 12px;border:1px solid var(--pink);border-radius:12px;background:#fff;transition:all .2s;white-space:nowrap;}
+.hist-item .del:hover{background:linear-gradient(90deg,#fb7185,#f43f5e);color:#fff;}
 
 .list-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);}
 .list-item:last-child{border-bottom:none;}
@@ -79,28 +84,12 @@ body{
 .list-item .edit{color:var(--primary);font-size:13px;cursor:pointer;padding:4px 10px;border:1px solid var(--primary);border-radius:12px;background:#fff;transition:all .2s;}
 .list-item .edit:hover{background:linear-gradient(90deg,var(--primary),#6a96ff);color:#fff;}
 
-/* 柱形图 */
-.chart{display:flex;align-items:flex-end;gap:14px;height:200px;padding:10px 0;}
-.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;}
-.bar{width:60%;max-width:50px;border-radius:8px 8px 0 0;background:linear-gradient(180deg,var(--pink),var(--purple));min-height:4px;transition:height .5s;}
-.bar-label{margin-top:8px;font-size:12px;color:var(--text2);}
-.bar-val{font-size:12px;color:var(--text);margin-bottom:4px;}
-.total-visits{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
-.total-visits .stat{flex:1;min-width:120px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;text-align:center;box-shadow:var(--shadow);}
-.total-visits .stat .num{font-size:30px;font-weight:800;
-  background:linear-gradient(90deg,var(--primary),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.total-visits .stat .lab{font-size:13px;color:var(--text2);margin-top:4px;}
-
 /* 登录 */
 .login-wrap{max-width:340px;margin:40px auto;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:30px 28px;box-shadow:0 20px 50px rgba(79,124,255,.2);}
 .login-wrap h1{font-size:22px;margin-bottom:18px;color:var(--text);
   background:linear-gradient(90deg,var(--primary),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.login-tabs{display:flex;gap:8px;margin-bottom:20px;}
-.login-tab{flex:1;padding:9px;border-radius:14px;border:1px solid var(--border);background:#f7f9ff;color:var(--text2);font-size:14px;font-weight:600;cursor:pointer;transition:all .25s;}
-.login-tab.active{background:linear-gradient(90deg,var(--primary),var(--purple));color:#fff;border-color:transparent;}
 .login-err{color:#f43f5e;margin-top:10px;min-height:20px;font-size:13px;}
 .login-tip{margin-top:16px;font-size:13px;color:var(--text2);}
-.login-tip a{color:var(--primary);cursor:pointer;font-weight:600;}
 
 /* 弹窗 */
 .modal-mask{position:fixed;inset:0;background:rgba(30,40,80,.4);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:999;}
@@ -138,21 +127,9 @@ body{
 
   <div id="loginBox">
     <div class="login-wrap">
-      <h1>🔐 登录</h1>
-      <div class="login-tabs">
-        <div class="login-tab active" id="ltUser" onclick="switchLogin('user')">用户登录</div>
-        <div class="login-tab" id="ltAdmin" onclick="switchLogin('admin')">管理员登录</div>
-      </div>
-      <!-- 用户登录 -->
-      <div id="userLogin">
-        <div class="field"><label>用户名</label><input id="loginUser" placeholder="请输入用户名"></div>
-        <div class="field"><label>密码</label><input type="password" id="loginPass" placeholder="请输入密码"></div>
-        <div class="login-err" id="userLoginErr"></div>
-        <button class="btn btn-blue" style="width:100%;" onclick="userLogin()">登 录</button>
-        <div class="login-tip">没有账号？请联系管理员添加账号</div>
-      </div>
+      <h1>🔐 管理员登录</h1>
       <!-- 管理员登录 -->
-      <div id="adminLogin" style="display:none;">
+      <div id="adminLogin">
         <div class="field"><label>管理密码</label><input type="password" id="adminPass" placeholder="输入管理密码"></div>
         <div class="login-err" id="adminLoginErr"></div>
         <button class="btn btn-blue" style="width:100%;" onclick="verifyPass()">进 入</button>
@@ -167,7 +144,6 @@ body{
       <div class="tab t2" data-tab="2">👤 注册用户</div>
       <div class="tab t3" data-tab="3">👥 用户列表</div>
       <div class="tab t4" data-tab="4">🎵 歌曲请求</div>
-      <div class="tab t5" data-tab="5">📊 访问统计</div>
     </div>
 
     <div class="panel show" id="panel0">
@@ -181,7 +157,10 @@ body{
 
     <div class="panel" id="panel1">
       <div class="box">
-        <h3>公告历史</h3>
+        <div class="box-head">
+          <h3>公告历史</h3>
+          <button class="btn btn-red" onclick="showClearConfirm()" style="padding:8px 16px;font-size:13px;">🗑 清空所有公告</button>
+        </div>
         <div id="annHist"></div>
       </div>
     </div>
@@ -209,15 +188,6 @@ body{
         <div id="reqList"></div>
       </div>
     </div>
-
-    <div class="panel" id="panel5">
-      <div class="box">
-        <h3>访问统计</h3>
-        <div class="total-visits" id="totalStats"></div>
-        <h3 style="font-size:15px;margin-bottom:10px;">最近7天访问量</h3>
-        <div class="chart" id="chart"></div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -240,6 +210,26 @@ body{
     <div class="field"><label>新密码</label><input type="password" id="editPass" placeholder="请输入新密码"></div>
     <div class="modal-err" id="editErr"></div>
     <button class="modal-btn" onclick="confirmEdit()">确认修改</button>
+  </div>
+</div>
+
+<!-- 删除公告弹窗 -->
+<div class="modal-mask" id="delAnnModal">
+  <div class="modal-box">
+    <button class="close-x" id="closeDelAnn">✕</button>
+    <h3>删除公告</h3>
+    <div class="modal-text">确定删除这条公告吗？<br>此操作不可撤销。</div>
+    <button class="modal-btn danger" onclick="confirmDelAnn()">确认删除</button>
+  </div>
+</div>
+
+<!-- 清空公告弹窗 -->
+<div class="modal-mask" id="clearAnnModal">
+  <div class="modal-box">
+    <button class="close-x" id="closeClearAnn">✕</button>
+    <h3>清空所有公告</h3>
+    <div class="modal-text">确定要删除所有公告吗？此操作不可撤销。</div>
+    <button class="modal-btn danger" onclick="confirmClearAnn()">确认清空</button>
   </div>
 </div>
 
@@ -269,32 +259,6 @@ function toast(msg){
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>t.classList.remove('show'),2000);
 }
-
-// 登录类型切换
-function switchLogin(type){
-  document.getElementById('ltUser').classList.toggle('active',type==='user');
-  document.getElementById('ltAdmin').classList.toggle('active',type==='admin');
-  document.getElementById('userLogin').style.display = type==='user' ? 'block' : 'none';
-  document.getElementById('adminLogin').style.display = type==='admin' ? 'block' : 'none';
-}
-
-// 用户登录（普通用户）
-async function userLogin(){
-  const u=document.getElementById('loginUser').value.trim();
-  const p=document.getElementById('loginPass').value;
-  const err=document.getElementById('userLoginErr');
-  if(!u||!p){ err.textContent='请填写用户名和密码'; return; }
-  try{
-    const r=await fetch(API+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
-    const data=await r.json();
-    if(data&&data.code===0){
-      localStorage.setItem('lhb_user',u);
-      err.textContent='';
-      toast('登录成功，欢迎 '+u+'！');
-    } else err.textContent=(data&&data.msg)||'用户名或密码错误';
-  }catch(e){ err.textContent='网络错误，请重试'; }
-}
-document.getElementById('loginPass').addEventListener('keydown',e=>{ if(e.key==='Enter')userLogin(); });
 
 // 管理员登录
 function verifyPass(){
@@ -348,7 +312,7 @@ function hideModal(el){
 }
 
 function authHeaders(json){ const h={[AUTH_HEADER]:PASSWORD}; if(json) h['Content-Type']='application/json'; return h; }
-async function loadAll(){ loadAnnHist(); loadUsers(); loadRequests(); loadStats(); }
+async function loadAll(){ loadAnnHist(); loadUsers(); loadRequests(); }
 
 // 发布公告
 async function publishAnn(){
@@ -363,7 +327,8 @@ async function publishAnn(){
   }catch(e){ msg.textContent='网络错误'; }
 }
 
-// 公告历史（保留全部记录，显示时间+内容）
+// 公告历史（倒序，最新在上，带删除按钮）
+let delAnnId=null;
 async function loadAnnHist(){
   const el=document.getElementById('annHist');
   try{
@@ -371,28 +336,57 @@ async function loadAnnHist(){
     const data=await r.json();
     const list=(data&&data.data)||[];
     if(!list.length){ el.innerHTML='<div class="hist-item">暂无公告</div>'; return; }
-    // 最新的在上
+    // 最新的在上（倒序）
     const rev=[...list].reverse();
     el.innerHTML=rev.map(a=>`
       <div class="hist-item">
-        <div class="content">${a.content||a.title||'无内容'}</div>
-        <div class="time">🕐 ${a.time||a.created||''}</div>
+        <div>
+          <div class="content">${a.content||a.title||'无内容'}</div>
+          <div class="time">🕐 ${a.time||a.created||''}</div>
+        </div>
+        <span class="del" onclick="openDelAnn(${a.id})">删除</span>
       </div>`).join('');
   }catch(e){ el.innerHTML='<div class="hist-item">加载失败</div>'; }
+}
+// 删除单条公告
+function openDelAnn(id){
+  delAnnId=id;
+  document.getElementById('delAnnModal').classList.add('show');
+}
+document.getElementById('closeDelAnn').onclick=()=>hideModal(document.getElementById('delAnnModal'));
+document.getElementById('delAnnModal').addEventListener('click',e=>{ if(e.target.id==='delAnnModal')hideModal(e.target); });
+async function confirmDelAnn(){
+  try{
+    const r=await fetch(API+'/announcement',{method:'DELETE',headers:authHeaders(true),body:JSON.stringify({id:delAnnId})});
+    const data=await r.json();
+    if(data&&data.code===0){ hideModal(document.getElementById('delAnnModal')); toast('已删除公告'); loadAnnHist(); }
+    else toast('删除失败');
+  }catch(e){ toast('网络错误'); }
+}
+// 清空所有公告
+function showClearConfirm(){ document.getElementById('clearAnnModal').classList.add('show'); }
+document.getElementById('closeClearAnn').onclick=()=>hideModal(document.getElementById('clearAnnModal'));
+document.getElementById('clearAnnModal').addEventListener('click',e=>{ if(e.target.id==='clearAnnModal')hideModal(e.target); });
+async function confirmClearAnn(){
+  try{
+    const r=await fetch(API+'/announcements',{method:'DELETE',headers:authHeaders(true)});
+    const data=await r.json();
+    if(data&&data.code===0){ hideModal(document.getElementById('clearAnnModal')); toast('已清空所有公告'); loadAnnHist(); }
+    else toast('清空失败');
+  }catch(e){ toast('网络错误'); }
 }
 
 // 注册用户
 async function adminReg(){
   const u=document.getElementById('regUser').value.trim(), p=document.getElementById('regPass').value;
   const msg=document.getElementById('regMsg');
-  msg.className='msg'; // 重置为绿色
+  msg.className='msg';
   if(!u||!p){ msg.textContent='请填写用户名和密码'; return; }
   try{
     const r=await fetch(API+'/register',{method:'POST',headers:authHeaders(true),body:JSON.stringify({username:u,password:p})});
     const data=await r.json();
     if(data&&data.code===0){ msg.textContent='✓ 注册成功'; document.getElementById('regUser').value=''; document.getElementById('regPass').value=''; loadUsers(); }
     else {
-      // 用户名已存在等错误显示红色
       msg.className='msg err';
       msg.textContent=(data&&data.msg)||'注册失败';
     }
@@ -419,7 +413,7 @@ async function loadUsers(){
   }catch(e){ el.innerHTML='<div class="list-item">加载失败</div>'; }
 }
 
-// 修改密码（弹窗，用户名固定显示，修复「用户名不能为空」bug）
+// 修改密码
 let editId=null;
 function openEdit(id,name){
   editId=id;
@@ -435,7 +429,6 @@ async function confirmEdit(){
   const err=document.getElementById('editErr');
   if(!newPass){ err.textContent='密码不能为空'; return; }
   try{
-    // 修复：不再重新传 username，只传 id 和 password
     const r=await fetch(API+'/user',{method:'PUT',headers:authHeaders(true),body:JSON.stringify({id:editId,password:newPass})});
     const data=await r.json();
     if(data&&data.code===0){ hideModal(document.getElementById('editModal')); toast('修改成功'); loadUsers(); }
@@ -443,7 +436,7 @@ async function confirmEdit(){
   }catch(e){ err.textContent='网络错误'; }
 }
 
-// 删除用户（弹窗）
+// 删除用户
 let delId=null;
 function openDel(id,name){
   delId=id;
@@ -482,37 +475,6 @@ async function delReq(id){
     const data=await r.json();
     if(data&&data.code===0) loadRequests(); else toast('操作失败');
   }catch(e){ toast('网络错误'); }
-}
-
-// 访问统计
-async function loadStats(){
-  const statEl=document.getElementById('totalStats');
-  try{
-    const r=await fetch(API+'/stats/visits',{headers:authHeaders()});
-    const data=await r.json();
-    const days=(data&&data.data)||[];
-    const total=days.reduce((s,d)=>s+(Number(d.count)||0),0);
-    statEl.innerHTML=`
-      <div class="stat"><div class="num">${total}</div><div class="lab">总访问量</div></div>
-      <div class="stat"><div class="num">${days.length}</div><div class="lab">统计天数</div></div>`;
-    renderChart(days);
-  }catch(e){
-    statEl.innerHTML=`<div class="stat"><div class="num">0</div><div class="lab">总访问量</div></div>`;
-    renderChart([]);
-  }
-}
-function renderChart(days){
-  const el=document.getElementById('chart');
-  if(!days.length){
-    el.innerHTML='<div style="width:100%;text-align:center;color:var(--text2);padding:40px 0;">暂无统计数据</div>';
-    return;
-  }
-  const recent=days.slice(-7);
-  const max=Math.max(...recent.map(d=>Number(d.count)||0),1);
-  el.innerHTML=recent.map(d=>{
-    const h=Math.round((Number(d.count)||0)/max*100);
-    return `<div class="bar-col"><div class="bar-val">${d.count||0}</div><div class="bar" style="height:${h}%"></div><div class="bar-label">${d.date}</div></div>`;
-  }).join('');
 }
 
 // 初始化
