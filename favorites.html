@@ -249,6 +249,11 @@ function removeFav(i){
 // 一键播放：返回时回到收藏夹界面
 function playAll(){
   if(!favs.length) return;
+  // 内嵌模式（从音乐播放器收藏夹弹窗打开）：通知外层播放，音乐不中断
+  if(new URLSearchParams(location.search).get('embed')==='1'){
+    parent.postMessage({type:'playFav'},'*');
+    return;
+  }
   location.href='music.html?play=fav&from=fav';
 }
 

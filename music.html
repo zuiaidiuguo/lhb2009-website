@@ -83,11 +83,15 @@ body{
 .now-artist{text-align:center;color:var(--text2);font-size:13px;margin-bottom:12px;}
 .fav-btn{display:inline-flex;align-items:center;gap:4px;margin:0 auto 10px;padding:6px 16px;border-radius:20px;border:1px solid var(--pink);color:var(--pink);font-size:14px;font-weight:600;cursor:pointer;background:#fff;transition:background .2s,color .2s;}
 .fav-btn.active{background:linear-gradient(90deg,var(--pink),var(--purple));color:#fff;border-color:transparent;}
+.like-btn{display:inline-flex;align-items:center;gap:4px;margin:0 auto 10px;padding:6px 16px;border-radius:20px;border:1px solid var(--pink);color:var(--pink);font-size:14px;font-weight:600;cursor:pointer;background:#fff;transition:background .2s,color .2s;}
+.like-btn.active{background:linear-gradient(90deg,var(--pink),var(--purple));color:#fff;border-color:transparent;}
 
 /* 歌词 */
 .lyrics{height:150px;overflow-y:auto;text-align:center;padding:8px 0;margin-bottom:12px;border:1px solid var(--border);border-radius:12px;background:#fafbff;}
 .lyrics .ly{padding:5px 0;color:var(--text2);font-size:14px;transition:all .2s;}
+.lyrics .ly .l-tr{font-size:12px;color:#9aa0b8;display:block;line-height:1.4;}
 .lyrics .ly.active{color:var(--purple);font-size:16px;font-weight:700;}
+.lyrics .ly.active .l-tr{color:var(--pink);font-size:13px;font-weight:500;}
 .no-lrc{text-align:center;color:var(--text2);padding:40px 0;font-size:14px;}
 .no-lrc .req{display:inline-block;margin-top:10px;padding:7px 18px;border-radius:18px;border:none;color:#fff;font-size:13px;cursor:pointer;
   background:linear-gradient(90deg,var(--primary),var(--purple));}
@@ -187,6 +191,7 @@ body{
       <div class="now-artist" id="nowArtist"></div>
       <div style="text-align:center;">
         <span class="fav-btn" id="detailFav" onclick="toggleFavDetail()">♡ 收藏</span>
+        <span class="like-btn" id="detailLike" onclick="toggleLike()">👍 点赞</span>
       </div>
       <div class="lyrics" id="lyrics"><div class="no-lrc">暂无歌词</div></div>
       <div class="time-row"><span id="curTime">0:00</span><span id="durTime">0:00</span></div>
@@ -262,6 +267,16 @@ body{
     <button class="modal-btn" onclick="submitReq()">提交请求</button>
   </div>
 </div>
+
+<!-- 收藏夹弹窗（内嵌，音乐继续播放，悬浮窗不消失） -->
+<div class="modal-mask" id="favModal">
+  <div class="modal-box" style="width:min(430px,94vw);max-width:430px;height:72vh;display:flex;flex-direction:column;padding:16px 16px 12px;">
+    <button class="close-x" onclick="closeFavModal()">✕</button>
+    <h3 style="margin-bottom:10px;">♡ 收藏夹</h3>
+    <iframe id="favFrame" src="favorites.html" style="flex:1;width:100%;border:none;border-radius:10px;background:#fff;"></iframe>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -404,12 +419,21 @@ function loadLrc(){
   }).then(txt=>{
     const lines=txt.split(/\r?\n/);
     const arr=[];
+    let prev=null;
     for(const ln of lines){
       const m=ln.match(/\[(\d{1,2}):(\d{2}(?:\.\d+)?)\](.*)/);
       if(m){
         const time=+m[1]*60+parseFloat(m[2]);
         const text=m[3].trim();
-        if(text)arr.push({t:time,txt:text});
+        if(text){
+          if(prev&&Math.abs(prev.t-time)<0.001){
+            // 同一时间戳的第二行视为翻译，存入 t2
+            prev.t2=text;
+          }else{
+            prev={t:time,txt:text};
+            arr.push(prev);
+          }
+        }
       }
     }
     if(arr.length){curLrc=arr;renderLrc();}
@@ -420,8 +444,13 @@ function renderLrc(){
   const box=$('lyrics');box.innerHTML='';
   curLrc.forEach((l,i)=>{
     const d=document.createElement('div');
-    d.className='ly';d.id='ly'+i;d.textContent=l.txt;
-    if(l.t2)d.title=l.t2;
+    d.className='ly';d.id='ly'+i;
+    if(l.t2){
+      // 原文 + 翻译，翻译用浅色小字显示
+      d.innerHTML='<span class="l-orig">'+l.txt+'</span><br><span class="l-tr">'+l.t2+'</span>';
+    }else{
+      d.textContent=l.txt;
+    }
     box.appendChild(d);
   });
 }
@@ -445,9 +474,11 @@ audio.addEventListener('timeupdate',()=>syncLrc(audio.currentTime));
 function openDetail(i){
   playSong(i,false);
   $('detailMask').classList.add('show');
+  document.body.style.overflow='hidden'; // 锁定背景滚动，后面不能翻动
   updateFavBtn();
+  updateLikeBtn();
 }
-function closeDetail(){$('detailMask').classList.remove('show');} // 返回按钮：音乐继续播放
+function closeDetail(){ $('detailMask').classList.remove('show'); document.body.style.overflow=''; } // 返回按钮：音乐继续播放
 
 /* ===== 收藏 ===== */
 function toggleFav(name,e){
@@ -472,6 +503,31 @@ function updateFavBtn(){
   b.classList.toggle('active',on);
 }
 function toggleFavDetail(){if(cur<0)return;toggleFav(SONGS[cur]);}
+
+/* ===== 点赞 ===== */
+const LIKE_KEY='lhb_like_';
+function getLikes(){const u=getUser();try{return JSON.parse(localStorage.getItem(LIKE_KEY+u)||'[]');}catch(e){return [];}}
+function saveLikes(l){const u=getUser();if(u)localStorage.setItem(LIKE_KEY+u,JSON.stringify(l));}
+function isLike(name){return getLikes().includes(name);}
+function toggleLike(){
+  if(cur<0)return;
+  const u=getUser();
+  if(!u){openLogin();return;}
+  const name=SONGS[cur];
+  let l=getLikes();
+  const i=l.indexOf(name);
+  if(i>=0)l.splice(i,1);else l.push(name);
+  saveLikes(l);
+  updateLikeBtn();
+  toast(isLike(name)?'已点赞':'已取消点赞');
+}
+function updateLikeBtn(){
+  if(cur<0)return;
+  const on=isLike(SONGS[cur]);
+  const b=$('detailLike');
+  b.textContent=on?'👍 已点赞':'👍 点赞';
+  b.classList.toggle('active',on);
+}
 
 /* ===== 列表渲染 ===== */
 function renderList(){
@@ -599,15 +655,19 @@ async function submitReq(){
   }catch(e){err.textContent='网络错误，请稍后重试';}
 }
 
-/* ===== 打开收藏夹弹窗（悬浮窗不消失） ===== */
+/* ===== 打开收藏夹弹窗（内嵌，音乐继续播放，悬浮窗不消失） ===== */
 function openFav(){
   const u=getUser();
   if(!u){toast('请先登录');openLogin();return;}
   const f=getFavs();
   if(!f.length){toast('收藏夹为空');return;}
-  // 直接跳转到收藏夹页面
-  location.href='favorites.html';
+  // 内嵌 iframe 打开收藏夹，不跳转页面，音乐继续播放
+  const frame=$('favFrame');
+  frame.src='favorites.html?embed=1&t='+Date.now();
+  $('favModal').classList.add('show');
 }
+function closeFavModal(){ $('favModal').classList.remove('show'); }
+document.getElementById('favModal').addEventListener('click',e=>{ if(e.target.id==='favModal')closeFavModal(); });
 
 /* ===== 倍速 ===== */
 document.querySelectorAll('#speedBar .chip').forEach(c=>{
@@ -637,6 +697,18 @@ document.querySelectorAll('#speedBar .chip').forEach(c=>{
 /* ===== 启动 ===== */
 renderList();
 updateProg();
+
+// 接收收藏夹 iframe 的「一键播放」消息，播放收藏队列
+window.addEventListener('message',e=>{
+  if(e.data&&e.data.type==='playFav'){
+    const f=getFavs();
+    if(f.length){
+      favQueue=f;
+      const first=SONGS.indexOf(f[0]);
+      openDetail(first>=0?first:0);
+    }
+  }
+});
 </script>
 </body>
 </html>
