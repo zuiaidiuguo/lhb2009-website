@@ -200,12 +200,37 @@ let curLrc=null;
 function loadLrc(){
   curLrc=null;
   fetch(lrcUrl(SONGS[cur])).then(r=>{if(!r.ok)throw 0;return r.text();}).then(txt=>{
-    const lines=txt.split(/\r?\n/);const arr=[];let prev=null;
-    for(const ln of lines){const m=ln.match(/\[(\d{1,2}):(\d{2}(?:\.\d+)?)\](.*)/);if(m){const time=+m[1]*60+parseFloat(m[2]);const text=m[3].trim();if(text){if(prev&&Math.abs(prev.t-time)<0.001){prev.t2=text;}else{prev={t:time,txt:text};arr.push(prev);}}}}
+    // 解析所有 [time]text 行，跳过空行
+    const rows=[];
+    for(const ln of txt.split(/\r?\n/)){
+      const m=ln.match(/\[(\d{1,2}):(\d{2}(?:\.\d+)?)\](.*)/);
+      if(m){
+        const time=+m[1]*60+parseFloat(m[2]);
+        const text=m[3].trim();
+        if(text) rows.push({t:time,txt:text});
+      }
+    }
+    // 按时间戳分组：同一时间戳可能有多行（英文歌中翻译行与下一句原句共享时间戳）
+    const groups={};const order=[];
+    for(const r of rows){
+      if(!groups[r.t]){groups[r.t]=[];order.push(r.t);}
+      groups[r.t].push(r.txt);
+    }
+    // 合并：同一时间戳若有多行，第一行作为翻译归到前一个原句，其余行作为新的原句
+    const arr=[];
+    for(const t of order){
+      const texts=groups[t];
+      if(arr.length&&texts.length>=2){
+        arr[arr.length-1].t2=texts[0];            // 翻译归到前一句
+        arr.push({t:t,txt:texts[texts.length-1]}); // 最后一行是新原句
+      }else{
+        arr.push({t:t,txt:texts[0]});
+      }
+    }
     if(arr.length){curLrc=arr;renderLrc();}else noLrc();
   }).catch(()=>noLrc());
 }
-function renderLrc(){const box=$('lyrics');box.innerHTML='';curLrc.forEach((l,i)=>{const d=document.createElement('div');d.className='ly';d.id='ly'+i;if(l.t2){d.innerHTML='<span class="l-orig">'+l.txt+'</span><br><span class="l-tr">'+l.t2+'</span>';}else{d.textContent=l.txt;}box.appendChild(d);});}
+function renderLrc(){const box=$('lyrics');box.innerHTML='';curLrc.forEach((l,i)=>{const d=document.createElement('div');d.className='ly';d.id='ly'+i;if(l.t2){d.innerHTML='<span class="l-orig">'+l.txt+'</span><br><span class="l-tr">'+l.t2+'</span>';}else{d.innerHTML='<span class="l-orig">'+l.txt+'</span>';}box.appendChild(d);});}
 function noLrc(){$('lyrics').innerHTML='<div class="no-lrc">暂无歌词</div>';}
 function syncLrc(t){if(!curLrc||!curLrc.length)return;let act=-1;for(let i=0;i<curLrc.length;i++){if(t>=curLrc[i].t)act=i;else break;}const box=$('lyrics');const list=box.querySelectorAll('.ly');list.forEach((el,i)=>el.classList.toggle('active',i===act));if(act>=0&&list[act])list[act].scrollIntoView({block:'center',behavior:'smooth'});}
 audio.addEventListener('timeupdate',()=>syncLrc(audio.currentTime));
