@@ -201,18 +201,6 @@ body{
   </div>
 </div>
 
-<!-- 修改密码弹窗 -->
-<div class="modal-mask" id="editModal">
-  <div class="modal-box">
-    <button class="close-x" id="closeEdit">✕</button>
-    <h3>修改用户密码</h3>
-    <div class="field"><label>用户名</label><input id="editName" disabled></div>
-    <div class="field"><label>新密码</label><input type="password" id="editPass" placeholder="请输入新密码"></div>
-    <div class="modal-err" id="editErr"></div>
-    <button class="modal-btn" onclick="confirmEdit()">确认修改</button>
-  </div>
-</div>
-
 <!-- 删除公告弹窗 -->
 <div class="modal-mask" id="delAnnModal">
   <div class="modal-box">
@@ -236,9 +224,8 @@ body{
 <!-- 退出登录弹窗 -->
 <div class="modal-mask" id="logoutModal">
   <div class="modal-box">
-    <button class="close-x" id="closeLogout">✕</button>
     <h3>退出登录</h3>
-    <div class="modal-text">已退出登录</div>
+    <div class="modal-text">你已退出</div>
     <button class="modal-btn" onclick="confirmLogout()">确 定</button>
   </div>
 </div>
@@ -283,19 +270,20 @@ function enterAdmin(){
   document.getElementById('logoutBtn').style.display='inline-block';
   loadAll();
 }
-function doLogout(){
-  document.getElementById('logoutModal').classList.add('show');
-}
 function confirmLogout(){
   localStorage.removeItem(AUTH_KEY);
   hideModal(document.getElementById('logoutModal'));
   document.getElementById('adminPanel').style.display='none';
   document.getElementById('loginBox').style.display='block';
   document.getElementById('logoutBtn').style.display='none';
-  toast('已退出登录');
+  toast('你已退出');
 }
-document.getElementById('closeLogout').onclick=()=>hideModal(document.getElementById('logoutModal'));
-document.getElementById('logoutModal').addEventListener('click',e=>{ if(e.target.id==='logoutModal')hideModal(e.target); });
+// 退出弹窗：无✕按钮，点确定后关闭；或3秒后自动关闭
+function doLogout(){
+  document.getElementById('logoutModal').classList.add('show');
+  clearTimeout(window._logoutTimer);
+  window._logoutTimer=setTimeout(()=>hideModal(document.getElementById('logoutModal')),3000);
+}
 
 document.getElementById('tabs').addEventListener('click',e=>{
   const tab=e.target.closest('.tab'); if(!tab) return;
@@ -314,11 +302,14 @@ function hideModal(el){
 function authHeaders(json){ const h={[AUTH_HEADER]:PASSWORD}; if(json) h['Content-Type']='application/json'; return h; }
 async function loadAll(){ loadAnnHist(); loadUsers(); loadRequests(); }
 
-// 发布公告
+// 发布公告（限制最多30字）
 async function publishAnn(){
   const content=document.getElementById('annContent').value.trim();
   const msg=document.getElementById('annMsg');
   if(!content){ msg.textContent=''; document.getElementById('annContent').style.borderColor='#f43f5e'; return; }
+  if(content.length>30){ msg.className='msg err'; msg.textContent='公告内容不能超过30个字'; document.getElementById('annContent').style.borderColor='#f43f5e'; return; }
+  document.getElementById('annContent').style.borderColor='';
+  msg.className='msg';
   try{
     const r=await fetch(API+'/announcement',{method:'POST',headers:authHeaders(true),body:JSON.stringify({content})});
     const data=await r.json();
@@ -411,34 +402,10 @@ async function loadUsers(){
       const uid=u.id;
       return `<div class="list-item">
         <span class="nm">${name}<div class="sub">注册于 ${u.created||'未知'}</div></span>
-        <span class="edit" onclick="openEdit(${uid},'${name}')">改密</span>
         <span class="del" onclick="openDel(${uid},'${name}')">删除</span>
       </div>`;
     }).join('');
   }catch(e){ el.innerHTML='<div class="list-item">加载失败</div>'; }
-}
-
-// 修改密码
-let editId=null;
-function openEdit(id,name){
-  editId=id;
-  document.getElementById('editName').value=name;
-  document.getElementById('editPass').value='';
-  document.getElementById('editErr').textContent='';
-  document.getElementById('editModal').classList.add('show');
-}
-document.getElementById('closeEdit').onclick=()=>hideModal(document.getElementById('editModal'));
-document.getElementById('editModal').addEventListener('click',e=>{ if(e.target.id==='editModal')hideModal(e.target); });
-async function confirmEdit(){
-  const newPass=document.getElementById('editPass').value;
-  const err=document.getElementById('editErr');
-  if(!newPass){ err.textContent='密码不能为空'; return; }
-  try{
-    const r=await fetch(API+'/user',{method:'PUT',headers:authHeaders(true),body:JSON.stringify({id:editId,password:newPass})});
-    const data=await r.json();
-    if(data&&data.code===0){ hideModal(document.getElementById('editModal')); toast('修改成功'); loadUsers(); }
-    else err.textContent=(data&&data.msg)||'修改失败';
-  }catch(e){ err.textContent='网络错误'; }
 }
 
 // 删除用户

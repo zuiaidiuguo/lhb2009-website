@@ -89,6 +89,7 @@ body{
 .modal-out{animation:modalOut .2s ease forwards;}
 @keyframes modalOut{from{opacity:1;transform:scale(1);}to{opacity:0;transform:scale(.92);}}
 .modal-box h3{text-align:center;margin-bottom:18px;font-size:20px;color:var(--text);}
+.ann-content{color:var(--text);font-size:16px;line-height:1.8;text-align:left;max-height:60vh;overflow-y:auto;white-space:pre-wrap;word-break:break-word;}
 .close-x{position:absolute;top:10px;right:14px;font-size:22px;color:var(--text2);cursor:pointer;background:none;border:none;}
 .close-x:hover{color:var(--purple);}
 .field{margin-bottom:14px;}
@@ -119,7 +120,7 @@ body{
     </div>
   </div>
 
-  <div class="announce">
+  <div class="announce" id="announceBar">
     <div class="announce-title"><span class="dot"></span>📢 公告</div>
     <div class="announce-track"><span class="marquee" id="marquee">正在加载公告...</span></div>
   </div>
@@ -140,6 +141,15 @@ body{
       <div class="info"><h2>更多工具</h2><p>敬请期待</p></div>
       <div class="arrow">›</div>
     </div>
+  </div>
+</div>
+
+<!-- 公告弹窗 -->
+<div class="modal-mask" id="annModal">
+  <div class="modal-box" id="annBox">
+    <button class="close-x" id="closeAnn">✕</button>
+    <h3>📢 公告</h3>
+    <div class="ann-content" id="annContent"></div>
   </div>
 </div>
 
@@ -172,6 +182,7 @@ function toast(msg){
 
 // 公告：只显示最新一条，只取内容；JS 驱动从右往左滚动，一条播完从头开始
 let scrollTimer=null;
+let latestAnnounce=''; // 保存最新公告完整内容，点击弹窗显示
 function startMarquee(text){
   const marquee=document.getElementById('marquee');
   marquee.textContent=text;
@@ -196,14 +207,25 @@ async function loadAnnouncements(){
       // 取最新一条：按时间倒序排，取第一条
       const sorted=[...list].sort((a,b)=>(new Date(b.time||b.created||0))-(new Date(a.time||a.created||0)));
       const latest=sorted[0];
-      startMarquee(latest.content||latest.title||'欢迎使用工具箱！');
+      latestAnnounce=latest.content||latest.title||'欢迎使用工具箱！';
+      startMarquee(latestAnnounce);
     } else {
-      startMarquee('欢迎使用工具箱！');
+      latestAnnounce='欢迎使用工具箱！';
+      startMarquee(latestAnnounce);
     }
   }catch(e){
-    startMarquee('欢迎使用工具箱！');
+    latestAnnounce='欢迎使用工具箱！';
+    startMarquee(latestAnnounce);
   }
 }
+
+// 点击公告栏弹出完整内容
+document.getElementById('announceBar').addEventListener('click',function(){
+  document.getElementById('annContent').textContent=latestAnnounce;
+  document.getElementById('annModal').classList.add('show');
+});
+document.getElementById('closeAnn').onclick=()=>hideModal(document.getElementById('annModal'));
+document.getElementById('annModal').addEventListener('click',e=>{ if(e.target.id==='annModal')hideModal(e.target); });
 
 // 登录状态
 function updateLoginUI(){
