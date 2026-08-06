@@ -92,7 +92,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",s
     <div class="topbtns"><button onclick="openRequest()">📝 求歌</button></div>
   </div>
   <div class="search"><input id="search" placeholder="搜索歌曲..."></div>
-  <div class="songlist" id="songlist"><div class="no-result">正在加载歌曲列表...</div></div>
+  <div class="songlist" id="songlist"></div>
 </div>
 
 <div class="detail-mask" id="detailMask">
@@ -148,7 +148,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",s
 const API='https://lhb2009.cc.cd';
 const USER_KEY='lhb_user';
 const REQ_KEY='lhb_req_time_';
-let SONGS=[];
+const SONGS=['5:20AM','爱错','爱情讯息','爱是无畏的冒险','白月光与朱砂痣','稻香','第五十七次取消发送','飞鸟和蝉','告白气球','爱人错过','孤勇者','红色高跟鞋','花海','兰亭序','离别开出花','鹿 be free','你从未离去','破茧','起风了','青花瓷','清空','晴天','少年','踏山河','我乘着风飞过来','雨爱','最后一页','All For Love','All My People','Counting Stars','Edge Of My Life','Fever Pitch','Good Time','Monsters','Nevada','Power','Remember Our Summer','Sold Out','Teeth','That Girl','The King','This Is It','Unstoppable','Wake'];
 
 const $=id=>document.getElementById(id);
 let toastTimer=null;
@@ -159,7 +159,7 @@ function getUser(){return localStorage.getItem(USER_KEY)||'';}
 let cur=-1,mode=0,loaded=false;
 const audio=new Audio();
 function songUrl(n){return '/music/'+encodeURIComponent(n)+'.mp3';}
-function lrcUrl(n){return '/lrc/'+encodeURIComponent(n)+'.lrc';}
+function lrcUrl(n){return '/music/'+encodeURIComponent(n)+'.lrc';}
 
 function playSong(i,auto){
   if(!SONGS.length)return;
@@ -248,20 +248,7 @@ async function submitReq(){const u=getUser(),name=$('reqName').value.trim(),note
 
 document.querySelectorAll('#speedBar .chip').forEach(c=>{c.onclick=()=>{document.querySelectorAll('#speedBar .chip').forEach(x=>x.classList.remove('active'));c.classList.add('active');audio.playbackRate=parseFloat(c.dataset.s);};});
 
-// 从 songs.json 加载歌曲列表
-async function loadSongs(){
-  try{
-    const r=await fetch(API+'/songs.json');
-    if(!r.ok)throw 0;
-    const data=await r.json();
-    SONGS=data.songs||data||[];
-    renderList();
-  }catch(e){
-    $('songlist').innerHTML='<div class="no-result">加载歌曲列表失败，请检查网络</div>';
-  }
-}
-
-loadSongs();
+renderList();
 updateProg();
 </script>
 </body>
