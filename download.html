@@ -64,7 +64,6 @@ body{
 <div class="toast" id="toast"></div>
 
 <script>
-const CDN='https://cdn.jsdmirror.cn/gh/zuiaidiuguo/lhb2009-website@master/';
 const tools=[
   {name:'截屏',file:'截屏.zip'},
   {name:'解压',file:'解压.zip'},
@@ -94,9 +93,7 @@ function renderList(){
     const d=document.createElement('div');
     d.className='item';
     d.style.animation='itemIn .3s ease '+(i*0.05)+'s both';
-    // 列表只显示文件名
     d.innerHTML=`<span class="nm">${t.file}</span><span class="dl">下载</span>`;
-    // 点击直接下载，不再弹验证码
     d.onclick=()=>downloadTool(t);
     listEl.appendChild(d);
   });
@@ -104,9 +101,8 @@ function renderList(){
 const itemInKey='@keyframes itemIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}';
 const style=document.createElement('style');style.textContent=itemInKey;document.head.appendChild(style);
 
-// 直接触发下载（无验证码）
 function downloadTool(tool){
-  const url=CDN+encodeURIComponent(tool.file);
+  const url='/download/'+encodeURIComponent(tool.file);
   const a=document.createElement('a');
   a.href=url; a.download=tool.file; a.rel='noopener';
   document.body.appendChild(a); a.click(); a.remove();

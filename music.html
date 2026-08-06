@@ -92,7 +92,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",s
     <div class="topbtns"><button onclick="openRequest()">📝 求歌</button></div>
   </div>
   <div class="search"><input id="search" placeholder="搜索歌曲..."></div>
-  <div class="songlist" id="songlist"></div>
+  <div class="songlist" id="songlist"><div class="no-result">正在加载歌曲列表...</div></div>
 </div>
 
 <div class="detail-mask" id="detailMask">
@@ -145,25 +145,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",s
 <div class="toast" id="toast"></div>
 
 <script>
-const API='https://sb.lhb2009.cc.cd';
-const CDN='https://cdn.jsdmirror.cn/gh/zuiaidiuguo/lhb2009-website@master/';
+const API='https://lhb2009.cc.cd';
 const USER_KEY='lhb_user';
 const REQ_KEY='lhb_req_time_';
-const SONGS=['爱错','爱情讯息','稻香','告白气球','红色高跟鞋','花海','鹿 be free','你从未离去','清空','晴天','我乘着风飞过来','最后一页','第五十七次取消发送','All For Love','All My People','Counting Stars','Edge Of My Life','Fever Pitch','Good Time','Monsters','Nevada','Power','Remember Our Summer','Sold Out','Teeth','That Girl','The King','This Is It','Unstoppable','Wake'];
+let SONGS=[];
 
 const $=id=>document.getElementById(id);
 let toastTimer=null;
 function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1800);}
 function fmt(t){if(!isFinite(t)||t<0)t=0;const m=Math.floor(t/60),s=Math.floor(t%60);return m+':'+(s<10?'0':'')+s;}
 function getUser(){return localStorage.getItem(USER_KEY)||'';}
-function isEnglishSong(name){return /^[A-Za-z0-9\s\-'&!.,]+$/.test(name);}
 
 let cur=-1,mode=0,loaded=false;
 const audio=new Audio();
-function songUrl(n){return CDN+'music/'+encodeURIComponent(n)+'.mp3';}
-function lrcUrl(n){return CDN+'music/'+encodeURIComponent(n)+'.lrc';}
+function songUrl(n){return '/music/'+encodeURIComponent(n)+'.mp3';}
+function lrcUrl(n){return '/lrc/'+encodeURIComponent(n)+'.lrc';}
 
 function playSong(i,auto){
+  if(!SONGS.length)return;
   if(i<0)i=SONGS.length-1;if(i>=SONGS.length)i=0;
   cur=i;loaded=false;
   $('detailTitle').textContent='正在努力加载中...';
@@ -186,8 +185,8 @@ function playSong(i,auto){
 
 function toggle(e){if(e&&e.stopPropagation)e.stopPropagation();if(cur<0)return;if(!loaded){toast('正在努力加载中...');return;}if(audio.paused)audio.play();else audio.pause();updatePlayBtn();}
 function updatePlayBtn(){const ic=audio.paused?'▶':'❚❚';$('playBtn').textContent=ic;}
-function prev(e){if(e&&e.stopPropagation)e.stopPropagation();playSong(cur-1);}
-function next(e){if(e&&e.stopPropagation)e.stopPropagation();if(mode===1){audio.currentTime=0;audio.play();updatePlayBtn();return;}if(mode===2&&SONGS.length){playSong(Math.floor(Math.random()*SONGS.length));return;}playSong(cur+1);}
+function prev(e){if(e&&e.stopPropagation)e.stopPropagation();if(!SONGS.length)return;playSong(cur-1);}
+function next(e){if(e&&e.stopPropagation)e.stopPropagation();if(!SONGS.length)return;if(mode===1){audio.currentTime=0;audio.play();updatePlayBtn();return;}if(mode===2){playSong(Math.floor(Math.random()*SONGS.length));return;}playSong(cur+1);}
 audio.addEventListener('ended',next);
 
 const MODES=[{i:'🔂',t:'列表循环'},{i:'🔁',t:'单曲循环'},{i:'🔀',t:'随机播放'}];
@@ -200,7 +199,6 @@ let curLrc=null;
 function loadLrc(){
   curLrc=null;
   fetch(lrcUrl(SONGS[cur])).then(r=>{if(!r.ok)throw 0;return r.text();}).then(txt=>{
-    // 解析所有 [time]text 行，跳过空行
     const rows=[];
     for(const ln of txt.split(/\r?\n/)){
       const m=ln.match(/\[(\d{1,2}):(\d{2}(?:\.\d+)?)\](.*)/);
@@ -210,19 +208,17 @@ function loadLrc(){
         if(text) rows.push({t:time,txt:text});
       }
     }
-    // 按时间戳分组：同一时间戳可能有多行（英文歌中翻译行与下一句原句共享时间戳）
     const groups={};const order=[];
     for(const r of rows){
       if(!groups[r.t]){groups[r.t]=[];order.push(r.t);}
       groups[r.t].push(r.txt);
     }
-    // 合并：同一时间戳若有多行，第一行作为翻译归到前一个原句，其余行作为新的原句
     const arr=[];
     for(const t of order){
       const texts=groups[t];
       if(arr.length&&texts.length>=2){
-        arr[arr.length-1].t2=texts[0];            // 翻译归到前一句
-        arr.push({t:t,txt:texts[texts.length-1]}); // 最后一行是新原句
+        arr[arr.length-1].t2=texts[0];
+        arr.push({t:t,txt:texts[texts.length-1]});
       }else{
         arr.push({t:t,txt:texts[0]});
       }
@@ -252,7 +248,20 @@ async function submitReq(){const u=getUser(),name=$('reqName').value.trim(),note
 
 document.querySelectorAll('#speedBar .chip').forEach(c=>{c.onclick=()=>{document.querySelectorAll('#speedBar .chip').forEach(x=>x.classList.remove('active'));c.classList.add('active');audio.playbackRate=parseFloat(c.dataset.s);};});
 
-renderList();
+// 从 songs.json 加载歌曲列表
+async function loadSongs(){
+  try{
+    const r=await fetch(API+'/songs.json');
+    if(!r.ok)throw 0;
+    const data=await r.json();
+    SONGS=data.songs||data||[];
+    renderList();
+  }catch(e){
+    $('songlist').innerHTML='<div class="no-result">加载歌曲列表失败，请检查网络</div>';
+  }
+}
+
+loadSongs();
 updateProg();
 </script>
 </body>
