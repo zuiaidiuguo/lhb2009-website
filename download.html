@@ -33,6 +33,15 @@ body{
   background:linear-gradient(90deg,var(--cyan),var(--primary));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 
+/* 分类选项卡 */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.tab{
+  padding:8px 16px;border-radius:20px;font-size:14px;font-weight:600;cursor:pointer;
+  border:1px solid var(--border);background:#fff;color:var(--text2);transition:all .2s;
+}
+.tab.active{background:linear-gradient(90deg,var(--cyan),var(--primary));color:#fff;border-color:transparent;}
+.tab:active{transform:scale(.95);}
+
 /* 工具包列表 */
 .list{display:flex;flex-direction:column;gap:12px;}
 .item{
@@ -41,8 +50,10 @@ body{
   transition:transform .25s ease,box-shadow .25s ease;
 }
 .item:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 12px 30px rgba(6,182,212,.28);}
+.item .cat{font-size:12px;color:var(--cyan);background:#eef7ff;padding:3px 10px;border-radius:10px;margin-bottom:4px;display:inline-block;}
 .item .nm{font-size:17px;font-weight:600;color:var(--text);}
 .item .dl{font-size:13px;color:#fff;background:linear-gradient(90deg,var(--cyan),var(--primary));padding:6px 16px;border-radius:20px;box-shadow:0 4px 12px rgba(6,182,212,.3);}
+.no-data{text-align:center;color:var(--text2);padding:40px 0;font-size:15px;}
 
 /* 轻提示 */
 .toast{position:fixed;left:50%;top:15%;transform:translateX(-50%) translateY(-10px);background:var(--card);color:var(--text);
@@ -58,25 +69,49 @@ body{
     <span class="title">📦 网盘工具</span>
   </div>
 
+  <div class="tabs" id="tabs"></div>
   <div class="list" id="list"></div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const tools=[
-  {name:'截屏',file:'截屏.zip'},
-  {name:'解压',file:'解压.zip'},
-  {name:'硬件检测工具',file:'硬件检测工具.zip'},
-  {name:'win7激活工具',file:'win7激活工具.zip'},
-  {name:'全能激活工具',file:'全能激活工具.zip'},
-  {name:'Dism++系统修复',file:'Dism++系统修复.zip'},
-  {name:'搞机工具箱11.1.2',file:'搞机工具箱11.1.2.7z'},
-  {name:'搜索工具',file:'搜索工具.zip'},
-  {name:'网络工具',file:'网络工具.zip'},
-  {name:'复制文件工具',file:'复制文件工具.zip'},
-  {name:'误删文件恢复工具',file:'误删文件恢复工具.zip'}
+// 4 个分类 + 工具包列表
+// category 对应缤纷云 bucket 里的文件夹名
+const CATEGORIES = ['安装工具', '绿色软件', '运行库', '游戏', '壁纸资源'];
+
+const tools = [
+  // 安装工具
+  {name:'VPN代理工具', category:'安装工具', file:'VPN代理工具.zip'},
+  {name:'下载加速器', category:'安装工具', file:'下载加速器.zip'},
+  {name:'万能播放器', category:'安装工具', file:'万能播放器.zip'},
+  {name:'动态壁纸软件', category:'安装工具', file:'动态壁纸软件.zip'},
+  {name:'GitHub加速工具', category:'安装工具', file:'GitHub加速工具.zip'},
+  // 绿色软件
+  {name:'截屏', category:'绿色软件', file:'截屏.zip'},
+  {name:'解压', category:'绿色软件', file:'解压.zip'},
+  {name:'硬件检测工具', category:'绿色软件', file:'硬件检测工具.zip'},
+  {name:'win7激活工具', category:'绿色软件', file:'win7激活工具.zip'},
+  {name:'全能激活工具', category:'绿色软件', file:'全能激活工具.zip'},
+  {name:'Dism++系统修复', category:'绿色软件', file:'Dism++系统修复.zip'},
+  {name:'搞机工具箱11.1.2', category:'绿色软件', file:'搞机工具箱11.1.2.zip'},
+  {name:'搜索工具', category:'绿色软件', file:'搜索工具.zip'},
+  {name:'网络工具', category:'绿色软件', file:'网络工具.zip'},
+  {name:'复制文件工具', category:'绿色软件', file:'复制文件工具.zip'},
+  {name:'误删文件恢复工具', category:'绿色软件', file:'误删文件恢复工具.zip'},
+  {name:'OBS录屏', category:'绿色软件', file:'OBS录屏.zip'},
+  {name:'uu远程', category:'绿色软件', file:'uu远程.zip'},
+  {name:'播放器', category:'绿色软件', file:'播放器.zip'},
+  {name:'磁盘工具', category:'绿色软件', file:'磁盘工具.zip'},
+  // 运行库
+  {name:'微软常用运行库合集', category:'运行库', file:'微软常用运行库合集.zip'},
+  // 游戏
+  {name:'植物大战僵尸3.8.1', category:'游戏', file:'植物大战僵尸3.8.1.zip'},
+  // 壁纸资源
+  {name:'动态壁纸资源', category:'壁纸资源', file:'动态壁纸资源.zip'},
 ];
+
+let activeCat = '全部';
 
 let toastTimer=null;
 function toast(msg){
@@ -86,14 +121,38 @@ function toast(msg){
   toastTimer=setTimeout(()=>t.classList.remove('show'),2000);
 }
 
+// 渲染分类选项卡
+const tabsEl=document.getElementById('tabs');
+function renderTabs(){
+  tabsEl.innerHTML='';
+  const allTab=document.createElement('span');
+  allTab.className='tab'+(activeCat==='全部'?' active':'');
+  allTab.textContent='全部';
+  allTab.onclick=()=>{activeCat='全部';renderTabs();renderList();};
+  tabsEl.appendChild(allTab);
+  CATEGORIES.forEach(cat=>{
+    const t=document.createElement('span');
+    t.className='tab'+(activeCat===cat?' active':'');
+    t.textContent=cat;
+    t.onclick=()=>{activeCat=cat;renderTabs();renderList();};
+    tabsEl.appendChild(t);
+  });
+}
+
+// 渲染工具列表
 const listEl=document.getElementById('list');
 function renderList(){
   listEl.innerHTML='';
-  tools.forEach((t,i)=>{
+  const filtered = activeCat==='全部' ? tools : tools.filter(t=>t.category===activeCat);
+  if(filtered.length===0){
+    listEl.innerHTML='<div class="no-data">该分类暂无工具</div>';
+    return;
+  }
+  filtered.forEach((t,i)=>{
     const d=document.createElement('div');
     d.className='item';
     d.style.animation='itemIn .3s ease '+(i*0.05)+'s both';
-    d.innerHTML=`<span class="nm">${t.file}</span><span class="dl">下载</span>`;
+    d.innerHTML=`<div><span class="cat">${t.category}</span><div class="nm">${t.name}</div></div><span class="dl">下载</span>`;
     d.onclick=()=>downloadTool(t);
     listEl.appendChild(d);
   });
@@ -102,13 +161,15 @@ const itemInKey='@keyframes itemIn{from{opacity:0;transform:translateY(12px);}to
 const style=document.createElement('style');style.textContent=itemInKey;document.head.appendChild(style);
 
 function downloadTool(tool){
-  const url='/download/'+encodeURIComponent(tool.file);
+  // 方案 A：URL 带分类，如 /download/安装工具/VPN代理工具.zip
+  const url='/download/'+encodeURIComponent(tool.category)+'/'+encodeURIComponent(tool.file);
   const a=document.createElement('a');
   a.href=url; a.download=tool.file; a.rel='noopener';
   document.body.appendChild(a); a.click(); a.remove();
-  toast('开始下载：'+tool.file);
+  toast('开始下载：'+tool.name);
 }
 
+renderTabs();
 renderList();
 </script>
 </body>
